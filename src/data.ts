@@ -33,6 +33,50 @@ export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
   }));
 }
 
+export async function getUpcomingGames() {
+  const today = new Date().toISOString().split('T')[0];
+  const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/schedule/${today}`);
+  const data = await response.json();
+  const games = data.gameWeek?.[0]?.games || [];
+  
+  const now = new Date();
+  const upcomingGames = games.filter((game: any) => new Date(game.startTimeUTC) > now);
+  
+  return upcomingGames.map((game: any) => ({
+    id: game.id,
+    homeTeam: game.homeTeam.abbrev,
+    awayTeam: game.awayTeam.abbrev,
+    startTime: game.startTimeUTC
+  }));
+}
+
+export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number) {
+  const { supabase } = await import('./supabase');
+  
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('currency')
+    .eq('id', userId)
+    .single();
+  
+  if (!profile || profile.currency < amount) {
+    throw new Error('Insufficient funds');
+  }
+  
+  await supabase.from('bets').insert({
+    user_id: userId,
+    game_id: gameId,
+    team_choice: teamChoice,
+    amount,
+    status: 'pending'
+  });
+  
+  await supabase
+    .from('profiles')
+    .update({ currency: profile.currency - amount })
+    .eq('id', userId);
+}
+
 export async function getTopPlayers(): Promise<Player[]> {
   const [pointsData, detailedData] = await Promise.all([
     fetchSkaterStats(),
