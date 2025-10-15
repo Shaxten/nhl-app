@@ -7,6 +7,7 @@ export interface Team {
   losses: number;
   otLosses: number;
   points: number;
+  gamesPlayed: number;
 }
 
 export interface Player {

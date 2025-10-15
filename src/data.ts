@@ -12,7 +12,8 @@ export async function getTeams(): Promise<Team[]> {
       wins: standing.wins,
       losses: standing.losses,
       otLosses: standing.otLosses,
-      points: standing.points
+      points: standing.points,
+      gamesPlayed: standing.gamesPlayed
     }] : []
   );
 }

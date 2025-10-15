@@ -32,6 +32,7 @@ function Divisions() {
                 <thead>
                   <tr>
                     <th>Team</th>
+                    <th>GP</th>
                     <th>Points</th>
                   </tr>
                 </thead>
@@ -39,6 +40,7 @@ function Divisions() {
                   {divisionTeams.map(team => (
                     <tr key={team.abbrev}>
                       <td>{team.name}</td>
+                      <td>{team.gamesPlayed}</td>
                       <td>{team.points}</td>
                     </tr>
                   ))}
