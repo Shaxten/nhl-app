@@ -50,7 +50,7 @@ export async function getUpcomingGames() {
   }));
 }
 
-export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number) {
+export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number, homeTeam: string, awayTeam: string) {
   const { supabase } = await import('./supabase');
   
   const { data: profile } = await supabase
@@ -68,7 +68,9 @@ export async function placeBet(userId: string, gameId: number, teamChoice: strin
     game_id: gameId,
     team_choice: teamChoice,
     amount,
-    status: 'pending'
+    status: 'pending',
+    home_team: homeTeam,
+    away_team: awayTeam
   });
   
   await supabase

@@ -49,7 +49,10 @@ function Betting() {
     }
 
     try {
-      await placeBet(user.id, gameId, teamChoice, amount);
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+      
+      await placeBet(user.id, gameId, teamChoice === 'home' ? game.homeTeam : game.awayTeam, amount, game.homeTeam, game.awayTeam);
       await refreshProfile();
       alert('Bet placed successfully!');
       setBetAmount({ ...betAmount, [gameId]: 0 });

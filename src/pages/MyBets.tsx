@@ -9,6 +9,8 @@ interface Bet {
   amount: number;
   status: string;
   created_at: string;
+  home_team?: string;
+  away_team?: string;
 }
 
 function MyBets() {
@@ -27,7 +29,24 @@ function MyBets() {
       .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
     
-    setBets(data || []);
+    if (data) {
+      const betsWithTeams = await Promise.all(
+        data.map(async (bet) => {
+          try {
+            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${bet.game_id}/landing`);
+            const gameData = await response.json();
+            return {
+              ...bet,
+              home_team: gameData.homeTeam?.abbrev || 'N/A',
+              away_team: gameData.awayTeam?.abbrev || 'N/A'
+            };
+          } catch {
+            return { ...bet, home_team: 'N/A', away_team: 'N/A' };
+          }
+        })
+      );
+      setBets(betsWithTeams);
+    }
     setLoading(false);
   }
 
@@ -59,8 +78,8 @@ function MyBets() {
       <table style={{ marginTop: '2rem' }}>
         <thead>
           <tr>
-            <th>Game ID</th>
-            <th>Team Choice</th>
+            <th>Game</th>
+            <th>Your Pick</th>
             <th>Amount</th>
             <th>Status</th>
             <th>Date</th>
@@ -70,7 +89,7 @@ function MyBets() {
         <tbody>
           {bets.map(bet => (
             <tr key={bet.id}>
-              <td>{bet.game_id}</td>
+              <td>{bet.away_team} @ {bet.home_team}</td>
               <td>{bet.team_choice}</td>
               <td>{bet.amount}</td>
               <td>
