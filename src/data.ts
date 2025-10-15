@@ -1,5 +1,5 @@
 import { Team, Player } from './types';
-import { fetchStandings, fetchTeamRoster, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
+import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
 
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchStandings();
