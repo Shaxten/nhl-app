@@ -15,7 +15,7 @@ export async function fetchPlayerStats(playerId: number) {
   return response.json();
 }
 
-function getCurrentSeason() {
+export function getCurrentSeason() {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();

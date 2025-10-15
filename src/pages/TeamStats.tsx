@@ -64,12 +64,18 @@ function TeamStats() {
             <thead>
               <tr>
                 <th>Player</th>
+                <th>Goals</th>
+                <th>Assists</th>
+                <th>Points</th>
               </tr>
             </thead>
             <tbody>
               {teamPlayers.map(player => (
                 <tr key={player.id}>
                   <td>{player.name}</td>
+                  <td>{player.goals}</td>
+                  <td>{player.assists}</td>
+                  <td>{player.points}</td>
                 </tr>
               ))}
             </tbody>

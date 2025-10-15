@@ -1,5 +1,5 @@
 import { Team, Player } from './types';
-import { fetchStandings, fetchTeamRoster, fetchSkaterStats, fetchSkaterStatsDetailed } from './api';
+import { fetchStandings, fetchTeamRoster, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
 
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchStandings();
@@ -19,19 +19,25 @@ export async function getTeams(): Promise<Team[]> {
 }
 
 export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
-  const roster = await fetchTeamRoster(teamAbbrev);
-  const forwards = roster.forwards || [];
-  const defensemen = roster.defensemen || [];
-  const allPlayers = [...forwards, ...defensemen];
-  
-  return allPlayers.map((player: any) => ({
-    id: player.id,
-    name: `${player.firstName.default} ${player.lastName.default}`,
-    teamAbbrev,
-    goals: 0,
-    assists: 0,
-    points: 0
-  }));
+  try {
+    const season = getCurrentSeason();
+    const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/club-stats/${teamAbbrev}/${season}/2`);
+    const data = await response.json();
+    
+    const skaters = data.skaters || [];
+    
+    return skaters.map((player: any) => ({
+      id: player.playerId,
+      name: player.firstName.default + ' ' + player.lastName.default,
+      teamAbbrev,
+      goals: player.goals,
+      assists: player.assists,
+      points: player.points
+    })).sort((a: any, b: any) => b.points - a.points);
+  } catch (error) {
+    console.error('Error fetching team players:', error);
+    return [];
+  }
 }
 
 export async function getUpcomingGames() {
