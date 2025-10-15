@@ -1,4 +1,4 @@
-const BASE_URL = 'https://api-web.nhle.com/v1';
+const BASE_URL = 'https://corsproxy.io/?https://api-web.nhle.com/v1';
 
 export async function fetchStandings() {
   const response = await fetch(`${BASE_URL}/standings/now`);
