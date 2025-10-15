@@ -11,7 +11,7 @@ interface Game {
 }
 
 function Betting() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState<{ [key: number]: number }>({});
@@ -50,6 +50,7 @@ function Betting() {
 
     try {
       await placeBet(user.id, gameId, teamChoice, amount);
+      await refreshProfile();
       alert('Bet placed successfully!');
       setBetAmount({ ...betAmount, [gameId]: 0 });
     } catch (error) {
