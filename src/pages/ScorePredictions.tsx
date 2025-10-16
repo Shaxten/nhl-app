@@ -40,7 +40,7 @@ function ScorePredictions() {
     setLoading(false);
   }
 
-  async function handleEdit(predId: number, gameId: number) {
+  async function handleEdit(predId: number) {
     const awayScore = prompt('Enter away team score:');
     const homeScore = prompt('Enter home team score:');
     
@@ -122,7 +122,7 @@ function ScorePredictions() {
               <td>{new Date(pred.created_at).toLocaleDateString()}</td>
               <td>
                 {canEdit(pred) ? (
-                  <button onClick={() => handleEdit(pred.id, pred.game_id)} style={{ padding: '0.25rem 0.5rem' }}>
+                  <button onClick={() => handleEdit(pred.id)} style={{ padding: '0.25rem 0.5rem' }}>
                     Edit
                   </button>
                 ) : (
