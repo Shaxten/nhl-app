@@ -42,9 +42,19 @@ export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
 
 export async function getUpcomingGames() {
   const today = new Date().toISOString().split('T')[0];
-  const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/schedule/${today}`);
-  const data = await response.json();
+  const [scheduleResponse, standingsData] = await Promise.all([
+    fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/schedule/${today}`),
+    fetchStandings()
+  ]);
+  const data = await scheduleResponse.json();
   const games = data.gameWeek?.[0]?.games || [];
+  
+  const teamRecords = new Map();
+  standingsData.standings.forEach((team: any) => {
+    if (team.teamAbbrev) {
+      teamRecords.set(team.teamAbbrev.default, `${team.wins}-${team.losses}-${team.otLosses}`);
+    }
+  });
   
   const now = new Date();
   const upcomingGames = games.filter((game: any) => new Date(game.startTimeUTC) > now);
@@ -53,7 +63,11 @@ export async function getUpcomingGames() {
     id: game.id,
     homeTeam: game.homeTeam.abbrev,
     awayTeam: game.awayTeam.abbrev,
-    startTime: game.startTimeUTC
+    startTime: game.startTimeUTC,
+    homeTeamLogo: game.homeTeam.logo,
+    awayTeamLogo: game.awayTeam.logo,
+    homeRecord: teamRecords.get(game.homeTeam.abbrev) || '',
+    awayRecord: teamRecords.get(game.awayTeam.abbrev) || ''
   }));
 }
 

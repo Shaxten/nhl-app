@@ -8,6 +8,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Betting from './pages/Betting';
 import MyBets from './pages/MyBets';
+import ScorePredictions from './pages/ScorePredictions';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 
@@ -32,6 +33,7 @@ function Navigation() {
             <ul className="dropdown-menu">
               <li><Link to="/betting">Betting</Link></li>
               {user && <li><Link to="/my-bets">My Bets</Link></li>}
+              {user && <li><Link to="/score-predictions">Score Predictions</Link></li>}
             </ul>
           </li>
           <li><Link to="/leaderboard">Leaderboard</Link></li>
@@ -62,6 +64,7 @@ function App() {
           <Route path="/players" element={<PlayerStats />} />
           <Route path="/betting" element={<Betting />} />
           <Route path="/my-bets" element={<MyBets />} />
+          <Route path="/score-predictions" element={<ScorePredictions />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />

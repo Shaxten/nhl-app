@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 
 interface LeaderboardEntry {
+  id: string;
   display_name: string;
   currency: number;
   bets_won: number;
   bets_lost: number;
   total_winnings: number;
+  score_predictions_total?: number;
+  score_predictions_correct?: number;
 }
 
 function Leaderboard() {
@@ -14,13 +17,32 @@ function Leaderboard() {
   const [loading, setLoading] = useState(true);
 
   async function fetchLeaderboard() {
-    const { data } = await supabase
+    const { data: profiles } = await supabase
       .from('profiles')
-      .select('display_name, currency, bets_won, bets_lost, total_winnings')
+      .select('id, display_name, currency, bets_won, bets_lost, total_winnings')
       .order('currency', { ascending: false })
       .limit(50);
     
-    setLeaders(data || []);
+    if (profiles) {
+      const enriched = await Promise.all(
+        profiles.map(async (profile) => {
+          const { data: predictions } = await supabase
+            .from('score_predictions')
+            .select('status')
+            .eq('user_id', profile.id);
+          
+          const total = predictions?.length || 0;
+          const correct = predictions?.filter(p => p.status === 'correct').length || 0;
+          
+          return {
+            ...profile,
+            score_predictions_total: total,
+            score_predictions_correct: correct
+          };
+        })
+      );
+      setLeaders(enriched);
+    }
     setLoading(false);
   }
 
@@ -51,6 +73,8 @@ function Leaderboard() {
             <th>Bets Won</th>
             <th>Bets Lost</th>
             <th>Win Rate</th>
+            <th>Score Predictions</th>
+            <th>Prediction Accuracy</th>
             <th>Total Winnings</th>
           </tr>
         </thead>
@@ -63,6 +87,8 @@ function Leaderboard() {
               <td>{leader.bets_won || 0}</td>
               <td>{leader.bets_lost || 0}</td>
               <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)}%</td>
+              <td>{leader.score_predictions_correct || 0}/{leader.score_predictions_total || 0}</td>
+              <td>{getWinRate(leader.score_predictions_correct || 0, leader.score_predictions_total || 0)}%</td>
               <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#4a9eff' : '#ff4a4a' }}>
                 {(leader.total_winnings || 0) >= 0 ? '+' : ''}{leader.total_winnings || 0}
               </td>

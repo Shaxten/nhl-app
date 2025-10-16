@@ -2,12 +2,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getUpcomingGames, placeBet } from '../data';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabase';
 
 interface Game {
   id: number;
   homeTeam: string;
   awayTeam: string;
   startTime: string;
+  homeTeamLogo?: string;
+  awayTeamLogo?: string;
+  homeRecord?: string;
+  awayRecord?: string;
 }
 
 function Betting() {
@@ -23,6 +28,51 @@ function Betting() {
       setLoading(false);
     });
   }, []);
+
+  async function handleScorePrediction(gameId: number, homeTeam: string, awayTeam: string) {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    // Check if user already has a prediction for this game
+    const { data: existing } = await supabase
+      .from('score_predictions')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('game_id', gameId)
+      .single();
+
+    if (existing) {
+      alert('You already have a prediction for this game. Use the Score Predictions page to edit it.');
+      return;
+    }
+
+    const awayScore = parseInt((document.getElementById(`away-${gameId}`) as HTMLInputElement).value);
+    const homeScore = parseInt((document.getElementById(`home-${gameId}`) as HTMLInputElement).value);
+
+    if (isNaN(awayScore) || isNaN(homeScore)) {
+      alert('Please enter valid scores');
+      return;
+    }
+
+    try {
+      await supabase.from('score_predictions').insert({
+        user_id: user.id,
+        game_id: gameId,
+        home_team: homeTeam,
+        away_team: awayTeam,
+        predicted_home_score: homeScore,
+        predicted_away_score: awayScore,
+        status: 'pending'
+      });
+      alert('Score prediction submitted!');
+      (document.getElementById(`away-${gameId}`) as HTMLInputElement).value = '';
+      (document.getElementById(`home-${gameId}`) as HTMLInputElement).value = '';
+    } catch (error) {
+      alert('Failed to submit prediction');
+    }
+  }
 
   async function handleBet(gameId: number, teamChoice: 'home' | 'away') {
     if (!user || !profile) {
@@ -80,8 +130,20 @@ function Betting() {
           
           return (
           <div key={game.id} className="division-card" style={{ marginBottom: '2rem' }}>
-            <h2>{game.awayTeam} @ {game.homeTeam}</h2>
-            <p style={{ color: '#aaa', marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '1rem' }}>
+              <div style={{ textAlign: 'center' }}>
+                <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '80px', height: '80px' }} />
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeam}</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '0.25rem' }}>{game.awayRecord}</p>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>@</div>
+              <div style={{ textAlign: 'center' }}>
+                <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeam}</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '0.25rem' }}>{game.homeRecord}</p>
+              </div>
+            </div>
+            <p style={{ color: '#aaa', marginBottom: '1rem', textAlign: 'center' }}>
               {new Date(game.startTime).toLocaleString()}
             </p>
             <div style={{ marginTop: '1rem' }}>
@@ -97,14 +159,41 @@ function Betting() {
             {bettingClosed ? (
               <p style={{ color: '#ff4a4a', marginTop: '1rem' }}>Betting closed</p>
             ) : (
-              <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                <button onClick={() => handleBet(game.id, 'away')}>
-                  Bet on {game.awayTeam}
-                </button>
-                <button onClick={() => handleBet(game.id, 'home')}>
-                  Bet on {game.homeTeam}
-                </button>
-              </div>
+              <>
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+                  <button onClick={() => handleBet(game.id, 'away')}>
+                    Bet on {game.awayTeam}
+                  </button>
+                  <button onClick={() => handleBet(game.id, 'home')}>
+                    Bet on {game.homeTeam}
+                  </button>
+                </div>
+                {(game.homeTeam === 'MTL' || game.awayTeam === 'MTL') && (
+                  <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
+                    <h4 style={{ marginBottom: '0.5rem' }}>Predict Final Score (MTL Game)</h4>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        placeholder={game.awayTeam}
+                        min="0"
+                        style={{ width: '60px', padding: '0.5rem' }}
+                        id={`away-${game.id}`}
+                      />
+                      <span>-</span>
+                      <input
+                        type="number"
+                        placeholder={game.homeTeam}
+                        min="0"
+                        style={{ width: '60px', padding: '0.5rem' }}
+                        id={`home-${game.id}`}
+                      />
+                      <button onClick={() => handleScorePrediction(game.id, game.homeTeam, game.awayTeam)}>
+                        Submit Prediction
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         );

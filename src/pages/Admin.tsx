@@ -125,6 +125,49 @@ function Admin() {
       }
 
       logs.push('Bet resolution complete!');
+      
+      // Resolve score predictions
+      logs.push('\nResolving score predictions...');
+      const { data: pendingPredictions } = await supabase
+        .from('score_predictions')
+        .select('*')
+        .eq('status', 'pending');
+
+      if (pendingPredictions && pendingPredictions.length > 0) {
+        logs.push(`Found ${pendingPredictions.length} pending predictions`);
+        
+        const predGameIds = [...new Set(pendingPredictions.map(p => p.game_id))];
+        
+        for (const gameId of predGameIds) {
+          try {
+            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
+            const gameData = await response.json();
+
+            if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') continue;
+
+            const homeScore = gameData.homeTeam?.score || 0;
+            const awayScore = gameData.awayTeam?.score || 0;
+            const gamePredictions = pendingPredictions.filter(p => p.game_id === gameId);
+
+            for (const pred of gamePredictions) {
+              const correct = pred.predicted_home_score === homeScore && pred.predicted_away_score === awayScore;
+              
+              await supabase.from('score_predictions').update({
+                status: correct ? 'correct' : 'incorrect',
+                actual_home_score: homeScore,
+                actual_away_score: awayScore
+              }).eq('id', pred.id);
+
+              logs.push(`  Game ${gameId}: ${correct ? 'CORRECT' : 'INCORRECT'} prediction`);
+            }
+          } catch (error) {
+            logs.push(`Error processing predictions for game ${gameId}`);
+          }
+        }
+      } else {
+        logs.push('No pending predictions');
+      }
+      
     } catch (error) {
       logs.push(`Error: ${error}`);
     }
