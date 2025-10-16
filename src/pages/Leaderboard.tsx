@@ -13,17 +13,18 @@ function Leaderboard() {
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
+  async function fetchLeaderboard() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('display_name, currency, bets_won, bets_lost, total_winnings')
+      .order('currency', { ascending: false })
+      .limit(50);
+    
+    setLeaders(data || []);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    async function fetchLeaderboard() {
-      const { data } = await supabase
-        .from('profiles')
-        .select('display_name, currency, bets_won, bets_lost, total_winnings')
-        .order('currency', { ascending: false })
-        .limit(50);
-      
-      setLeaders(data || []);
-      setLoading(false);
-    }
     fetchLeaderboard();
   }, []);
 
@@ -38,6 +39,9 @@ function Leaderboard() {
   return (
     <div className="container">
       <h1>Leaderboard</h1>
+      <button onClick={() => { setLoading(true); fetchLeaderboard(); }} style={{ marginTop: '1rem' }}>
+        Refresh
+      </button>
       <table style={{ marginTop: '2rem' }}>
         <thead>
           <tr>

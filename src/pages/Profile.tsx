@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 function Profile() {
-  const { profile, updateDisplayName } = useAuth();
+  const { profile, updateDisplayName, refreshProfile } = useAuth();
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [editing, setEditing] = useState(false);
 
@@ -23,6 +23,9 @@ function Profile() {
   return (
     <div className="container">
       <h1>Profile</h1>
+      <button onClick={refreshProfile} style={{ marginTop: '1rem' }}>
+        Refresh Stats
+      </button>
       <div className="team-stats" style={{ marginTop: '2rem' }}>
         <div className="stats-summary">
           <div className="stat-box">

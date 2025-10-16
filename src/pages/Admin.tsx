@@ -51,7 +51,11 @@ function Admin() {
             // Refund ties
             const gameBets = pendingBets.filter(b => b.game_id === gameId);
             for (const bet of gameBets) {
-              await supabase.from('bets').update({ status: 'refunded' }).eq('id', bet.id);
+              if (bet.status !== 'pending') continue;
+              
+              const { error: betError } = await supabase.from('bets').update({ status: 'refunded' }).eq('id', bet.id).eq('status', 'pending');
+              if (betError) continue;
+              
               const { data: profile } = await supabase
                 .from('profiles')
                 .select('currency')
@@ -72,10 +76,20 @@ function Admin() {
           const gameBets = pendingBets.filter(b => b.game_id === gameId);
           
           for (const bet of gameBets) {
+            // Skip if already processed
+            if (bet.status !== 'pending') continue;
+            
             const won = bet.team_choice === winner;
             const newStatus = won ? 'won' : 'lost';
 
-            await supabase.from('bets').update({ status: newStatus }).eq('id', bet.id);
+            // Update bet status first
+            const { error: betError } = await supabase.from('bets').update({ status: newStatus }).eq('id', bet.id).eq('status', 'pending');
+            
+            // If bet was already updated by another process, skip
+            if (betError) {
+              logs.push(`  Bet ${bet.id} already processed`);
+              continue;
+            }
 
             const { data: profile } = await supabase
               .from('profiles')
@@ -99,7 +113,10 @@ function Admin() {
                 logs.push(`  User ${profile.display_name}: LOST ${bet.amount}`);
               }
 
-              await supabase.from('profiles').update(updates).eq('id', bet.user_id);
+              const { error: profileError } = await supabase.from('profiles').update(updates).eq('id', bet.user_id);
+              if (profileError) {
+                logs.push(`  ERROR updating profile for ${profile.display_name}: ${profileError.message}`);
+              }
             }
           }
         } catch (error) {
@@ -122,13 +139,20 @@ function Admin() {
       <p style={{ marginTop: '1rem', color: '#aaa' }}>
         This will check all pending bets and resolve them based on game results.
       </p>
-      <button 
-        onClick={resolveBets} 
-        disabled={processing}
-        style={{ marginTop: '2rem' }}
-      >
-        {processing ? 'Processing...' : 'Resolve All Pending Bets'}
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+        <button 
+          onClick={resolveBets} 
+          disabled={processing}
+        >
+          {processing ? 'Processing...' : 'Resolve All Pending Bets'}
+        </button>
+        <button 
+          onClick={() => window.location.reload()} 
+          style={{ background: '#333' }}
+        >
+          Refresh Page
+        </button>
+      </div>
 
       {results.length > 0 && (
         <div style={{ marginTop: '2rem', background: '#1a1f3a', padding: '1rem', borderRadius: '8px' }}>
