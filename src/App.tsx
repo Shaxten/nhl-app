@@ -17,8 +17,8 @@ function Navigation() {
 
   return (
     <nav>
-      <ul style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+      <ul style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <li><Link to="/">Home</Link></li>
           <li className="dropdown">
             <span>Stats ▾</span>
@@ -43,7 +43,7 @@ function Navigation() {
             <li><Link to="/auth">Sign In</Link></li>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <li><Link to="/admin">Admin</Link></li>
           {user && <li><button onClick={signOut} style={{ padding: '0.5rem 1rem' }}>Sign Out</button></li>}
         </div>
