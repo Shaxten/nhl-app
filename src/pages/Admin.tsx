@@ -5,6 +5,78 @@ function Admin() {
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState<string[]>([]);
 
+  async function resolveScorePredictions() {
+    setProcessing(true);
+    setResults([]);
+    const logs: string[] = [];
+
+    try {
+      logs.push('Resolving score predictions...');
+      const { data: pendingPredictions, error: predError } = await supabase
+        .from('score_predictions')
+        .select('*')
+        .eq('status', 'pending');
+
+      if (predError) {
+        logs.push(`Error fetching predictions: ${predError.message}`);
+      } else if (pendingPredictions && pendingPredictions.length > 0) {
+        logs.push(`Found ${pendingPredictions.length} pending predictions`);
+        
+        const predGameIds = [...new Set(pendingPredictions.map(p => p.game_id))];
+        
+        for (const gameId of predGameIds) {
+          try {
+            logs.push(`Checking game ${gameId}...`);
+            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
+            const gameData = await response.json();
+            
+            logs.push(`Game ${gameId} state: ${gameData.gameState}`);
+
+            if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') {
+              logs.push(`Game ${gameId}: Not finished yet`);
+              continue;
+            }
+
+            const homeScore = gameData.homeTeam?.score;
+            const awayScore = gameData.awayTeam?.score;
+            logs.push(`Game ${gameId} final: Away ${awayScore} - Home ${homeScore}`);
+            
+            const gamePredictions = pendingPredictions.filter(p => p.game_id === gameId);
+            logs.push(`Found ${gamePredictions.length} predictions for this game`);
+
+            for (const pred of gamePredictions) {
+              const correct = pred.predicted_home_score === homeScore && pred.predicted_away_score === awayScore;
+              
+              logs.push(`Updating prediction ${pred.id}: predicted ${pred.predicted_away_score}-${pred.predicted_home_score}, actual ${awayScore}-${homeScore}`);
+              
+              const { error: updateError } = await supabase.from('score_predictions').update({
+                status: correct ? 'correct' : 'incorrect',
+                actual_home_score: homeScore,
+                actual_away_score: awayScore
+              }).eq('id', pred.id);
+
+              if (updateError) {
+                logs.push(`ERROR updating prediction ${pred.id}: ${updateError.message}`);
+              } else {
+                logs.push(`Prediction ${pred.id}: ${correct ? 'CORRECT' : 'INCORRECT'}`);
+              }
+            }
+          } catch (error) {
+            logs.push(`Error for game ${gameId}: ${error}`);
+          }
+        }
+        logs.push('Score predictions resolution complete!');
+      } else {
+        logs.push('No pending predictions');
+      }
+    } catch (error) {
+      logs.push(`Error: ${error}`);
+    }
+
+    setResults(logs);
+    setProcessing(false);
+  }
+
   async function resolveBets() {
     setProcessing(true);
     setResults([]);
@@ -124,49 +196,7 @@ function Admin() {
         }
       }
 
-      logs.push('Bet resolution complete!');
-      
-      // Resolve score predictions
-      logs.push('\nResolving score predictions...');
-      const { data: pendingPredictions } = await supabase
-        .from('score_predictions')
-        .select('*')
-        .eq('status', 'pending');
-
-      if (pendingPredictions && pendingPredictions.length > 0) {
-        logs.push(`Found ${pendingPredictions.length} pending predictions`);
-        
-        const predGameIds = [...new Set(pendingPredictions.map(p => p.game_id))];
-        
-        for (const gameId of predGameIds) {
-          try {
-            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
-            const gameData = await response.json();
-
-            if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') continue;
-
-            const homeScore = gameData.homeTeam?.score || 0;
-            const awayScore = gameData.awayTeam?.score || 0;
-            const gamePredictions = pendingPredictions.filter(p => p.game_id === gameId);
-
-            for (const pred of gamePredictions) {
-              const correct = pred.predicted_home_score === homeScore && pred.predicted_away_score === awayScore;
-              
-              await supabase.from('score_predictions').update({
-                status: correct ? 'correct' : 'incorrect',
-                actual_home_score: homeScore,
-                actual_away_score: awayScore
-              }).eq('id', pred.id);
-
-              logs.push(`  Game ${gameId}: ${correct ? 'CORRECT' : 'INCORRECT'} prediction`);
-            }
-          } catch (error) {
-            logs.push(`Error processing predictions for game ${gameId}`);
-          }
-        }
-      } else {
-        logs.push('No pending predictions');
-      }
+      logs.push('Bet resolution complete!')
       
     } catch (error) {
       logs.push(`Error: ${error}`);
@@ -182,12 +212,19 @@ function Admin() {
       <p style={{ marginTop: '1rem', color: '#aaa' }}>
         This will check all pending bets and resolve them based on game results.
       </p>
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
         <button 
           onClick={resolveBets} 
           disabled={processing}
         >
-          {processing ? 'Processing...' : 'Resolve All Pending Bets'}
+          {processing ? 'Processing...' : 'Resolve Pending Bets'}
+        </button>
+        <button 
+          onClick={resolveScorePredictions} 
+          disabled={processing}
+          style={{ background: '#4a9eff' }}
+        >
+          {processing ? 'Processing...' : 'Resolve Score Predictions'}
         </button>
         <button 
           onClick={() => window.location.reload()} 

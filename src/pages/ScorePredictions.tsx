@@ -108,7 +108,8 @@ function ScorePredictions() {
               <td>{pred.away_team} @ {pred.home_team}</td>
               <td>{pred.predicted_away_score} - {pred.predicted_home_score}</td>
               <td>
-                {pred.actual_away_score !== null && pred.actual_home_score !== null
+                {pred.actual_away_score !== null && pred.actual_away_score !== undefined && 
+                 pred.actual_home_score !== null && pred.actual_home_score !== undefined
                   ? `${pred.actual_away_score} - ${pred.actual_home_score}`
                   : '-'}
               </td>
