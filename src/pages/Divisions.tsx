@@ -33,6 +33,7 @@ function Divisions() {
                   <tr>
                     <th>Team</th>
                     <th>GP</th>
+                    <th>W-L-OT</th>
                     <th>Points</th>
                   </tr>
                 </thead>
@@ -41,6 +42,7 @@ function Divisions() {
                     <tr key={team.abbrev}>
                       <td>{team.name}</td>
                       <td>{team.gamesPlayed}</td>
+                      <td>{team.wins}-{team.losses}-{team.otLosses}</td>
                       <td>{team.points}</td>
                     </tr>
                   ))}
