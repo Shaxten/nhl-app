@@ -34,8 +34,9 @@ function ScorePredictions() {
 
     if (data) {
       setPredictions(data);
+      const resolved = data.filter(p => p.status === 'correct' || p.status === 'incorrect');
       const correct = data.filter(p => p.status === 'correct').length;
-      setStats({ total: data.length, correct });
+      setStats({ total: resolved.length, correct });
     }
     setLoading(false);
   }
