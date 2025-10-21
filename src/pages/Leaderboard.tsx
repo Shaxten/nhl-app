@@ -32,8 +32,8 @@ function Leaderboard() {
             .eq('user_id', profile.id);
           
           const resolved = predictions?.filter(p => p.status === 'correct' || p.status === 'incorrect') || [];
+          const correct = resolved.filter(p => p.status === 'correct').length;
           const total = resolved.length;
-          const correct = predictions?.filter(p => p.status === 'correct').length || 0;
           
           return {
             ...profile,
