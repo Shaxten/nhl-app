@@ -74,7 +74,8 @@ function Leaderboard() {
             <th>Bets Won</th>
             <th>Bets Lost</th>
             <th>Win Rate</th>
-            <th>Score Predictions</th>
+            <th>Total Predictions</th>
+            <th>Correct Predictions</th>
             <th>Prediction Accuracy</th>
             <th>Total Winnings</th>
           </tr>
@@ -88,8 +89,13 @@ function Leaderboard() {
               <td>{leader.bets_won || 0}</td>
               <td>{leader.bets_lost || 0}</td>
               <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)}%</td>
-              <td>{leader.score_predictions_correct || 0}/{leader.score_predictions_total || 0}</td>
-              <td>{getWinRate(leader.score_predictions_correct || 0, leader.score_predictions_total || 0)}%</td>
+              <td>{leader.score_predictions_total || 0}</td>
+              <td>{leader.score_predictions_correct || 0}</td>
+              <td>
+                {(leader.score_predictions_total || 0) > 0 
+                  ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)}%`
+                  : '0%'}
+              </td>
               <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#4a9eff' : '#ff4a4a' }}>
                 {(leader.total_winnings || 0) >= 0 ? '+' : ''}{leader.total_winnings || 0}
               </td>
