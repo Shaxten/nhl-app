@@ -1,35 +1,38 @@
 import { useState, useEffect } from 'react';
-import { getTopPlayers } from '../data';
+import { getTopPlayers, getTopGoalies } from '../data';
 import { Player } from '../types';
 
-type FilterType = 'points' | 'goals' | 'assists';
+type FilterType = 'points' | 'goals' | 'assists' | 'goalies';
 
 function PlayerStats() {
   const [filter, setFilter] = useState<FilterType>('points');
   const [players, setPlayers] = useState<Player[]>([]);
+  const [goalies, setGoalies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTopPlayers().then(data => {
-      console.log('Players data:', data);
-      setPlayers(data);
+    Promise.all([
+      getTopPlayers(),
+      getTopGoalies()
+    ]).then(([playersData, goaliesData]) => {
+      setPlayers(playersData);
+      setGoalies(goaliesData);
       setLoading(false);
     }).catch(err => {
-      console.error('Error fetching players:', err);
+      console.error('Error fetching data:', err);
       setLoading(false);
     });
   }, []);
 
   if (loading) return <div className="container"><h1>Loading...</h1></div>;
-  if (players.length === 0) return <div className="container"><h1>No players found</h1></div>;
 
-  const sortedPlayers = [...players]
-    .sort((a, b) => b[filter] - a[filter])
-    .slice(0, 20);
+  const sortedPlayers = filter === 'goalies' 
+    ? goalies.slice(0, 20)
+    : [...players].sort((a, b) => b[filter] - a[filter]).slice(0, 20);
 
   return (
     <div className="container">
-      <h1>Top 20 Players</h1>
+      <h1>Top 20 {filter === 'goalies' ? 'Goalies' : 'Players'}</h1>
       <div className="filters">
         <button 
           className={filter === 'points' ? 'active' : ''} 
@@ -49,32 +52,65 @@ function PlayerStats() {
         >
           Assists
         </button>
+        <button 
+          className={filter === 'goalies' ? 'active' : ''} 
+          onClick={() => setFilter('goalies')}
+        >
+          Goalies (Save %)
+        </button>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Player</th>
-            <th>Team</th>
-            <th>Goals</th>
-            <th>Assists</th>
-            <th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedPlayers.map((player, index) => (
-            <tr key={player.id}>
-              <td>{index + 1}</td>
-              <td>{player.name}</td>
-              <td>{player.teamAbbrev}</td>
-              <td>{player.goals}</td>
-              <td>{player.assists}</td>
-              <td>{player.points}</td>
+      {filter === 'goalies' ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Goalie</th>
+              <th>Team</th>
+              <th>Save %</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sortedPlayers.map((goalie, index) => (
+              <tr key={goalie.id}>
+                <td>{index + 1}</td>
+                <td>{goalie.name}</td>
+                <td>
+                  <img src={goalie.teamLogo} alt={goalie.teamAbbrev} style={{ width: '40px', height: '40px' }} />
+                </td>
+                <td>{goalie.savePct}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Player</th>
+              <th>Team</th>
+              <th>Goals</th>
+              <th>Assists</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedPlayers.map((player, index) => (
+              <tr key={player.id}>
+                <td>{index + 1}</td>
+                <td>{player.name}</td>
+                <td>
+                  <img src={player.teamLogo} alt={player.teamAbbrev} style={{ width: '40px', height: '40px' }} />
+                </td>
+                <td>{player.goals}</td>
+                <td>{player.assists}</td>
+                <td>{player.points}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

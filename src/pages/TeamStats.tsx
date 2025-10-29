@@ -64,8 +64,8 @@ function TeamStats() {
             <thead>
               <tr>
                 <th>Player</th>
-                <th>Goals</th>
-                <th>Assists</th>
+                <th>Goals / GP</th>
+                <th>Assists / Save %</th>
                 <th>Points</th>
               </tr>
             </thead>
@@ -74,7 +74,7 @@ function TeamStats() {
                 <tr key={player.id}>
                   <td>{player.name}</td>
                   <td>{player.goals}</td>
-                  <td>{player.assists}</td>
+                  <td>{player.name.includes('(G)') ? `${player.assists}%` : player.assists}</td>
                   <td>{player.points}</td>
                 </tr>
               ))}

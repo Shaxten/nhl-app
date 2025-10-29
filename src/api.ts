@@ -36,3 +36,10 @@ export async function fetchSkaterStatsDetailed() {
   const assistsData = await assistsResponse.json();
   return { goals: goalsData, assists: assistsData };
 }
+
+export async function fetchGoalieStats() {
+  const season = getCurrentSeason();
+  const response = await fetch(`${BASE_URL}/goalie-stats-leaders/${season}/2?categories=savePctg&limit=50`);
+  const data = await response.json();
+  return data;
+}

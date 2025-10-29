@@ -1,5 +1,5 @@
 import { Team, Player } from './types';
-import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
+import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, fetchGoalieStats, getCurrentSeason } from './api';
 
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchStandings();
@@ -25,15 +25,27 @@ export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
     const data = await response.json();
     
     const skaters = data.skaters || [];
+    const goalies = data.goalies || [];
     
-    return skaters.map((player: any) => ({
+    const skatersList = skaters.map((player: any) => ({
       id: player.playerId,
       name: player.firstName.default + ' ' + player.lastName.default,
       teamAbbrev,
       goals: player.goals,
       assists: player.assists,
       points: player.points
-    })).sort((a: any, b: any) => b.points - a.points);
+    }));
+    
+    const goaliesList = goalies.map((player: any) => ({
+      id: player.playerId,
+      name: player.firstName.default + ' ' + player.lastName.default + ' (G)',
+      teamAbbrev,
+      goals: player.gamesPlayed || 0,
+      assists: player.savePercentage ? (player.savePercentage * 100).toFixed(2) : '0.00',
+      points: 0
+    }));
+    
+    return [...skatersList.sort((a: any, b: any) => b.points - a.points), ...goaliesList];
   } catch (error) {
     console.error('Error fetching team players:', error);
     return [];
@@ -114,8 +126,22 @@ export async function getTopPlayers(): Promise<Player[]> {
     id: player.id,
     name: player.firstName.default + ' ' + player.lastName.default,
     teamAbbrev: player.teamAbbrev,
+    teamLogo: `https://assets.nhle.com/logos/nhl/svg/${player.teamAbbrev}_light.svg`,
     goals: goalsMap.get(player.id) || 0,
     assists: assistsMap.get(player.id) || 0,
     points: player.value
+  }));
+}
+
+export async function getTopGoalies(): Promise<any[]> {
+  const data = await fetchGoalieStats();
+  const goaliesList = data.savePctg || [];
+  
+  return goaliesList.map((goalie: any) => ({
+    id: goalie.id,
+    name: goalie.firstName.default + ' ' + goalie.lastName.default,
+    teamAbbrev: goalie.teamAbbrev,
+    teamLogo: goalie.teamLogo || `https://assets.nhle.com/logos/nhl/svg/${goalie.teamAbbrev}_light.svg`,
+    savePct: (goalie.value * 100).toFixed(2)
   }));
 }
