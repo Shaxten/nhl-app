@@ -1,5 +1,5 @@
 import { Team, Player } from './types';
-import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, fetchGoalieStats, getCurrentSeason } from './api';
+import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
 
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchStandings();
@@ -134,14 +134,33 @@ export async function getTopPlayers(): Promise<Player[]> {
 }
 
 export async function getTopGoalies(): Promise<any[]> {
-  const data = await fetchGoalieStats();
-  const goaliesList = data.savePctg || [];
+  const season = getCurrentSeason();
+  const teams = ['ANA', 'BOS', 'BUF', 'CAR', 'CBJ', 'CGY', 'CHI', 'COL', 'DAL', 'DET', 'EDM', 'FLA', 'LAK', 'MIN', 'MTL', 'NJD', 'NSH', 'NYI', 'NYR', 'OTT', 'PHI', 'PIT', 'SEA', 'SJS', 'STL', 'TBL', 'TOR', 'UTA', 'VAN', 'VGK', 'WPG', 'WSH'];
   
-  return goaliesList.map((goalie: any) => ({
-    id: goalie.id,
-    name: goalie.firstName.default + ' ' + goalie.lastName.default,
-    teamAbbrev: goalie.teamAbbrev,
-    teamLogo: goalie.teamLogo || `https://assets.nhle.com/logos/nhl/svg/${goalie.teamAbbrev}_light.svg`,
-    savePct: (goalie.value * 100).toFixed(2)
+  const allGoalies: any[] = [];
+  
+  await Promise.all(teams.map(async (team) => {
+    try {
+      const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/club-stats/${team}/${season}/2`);
+      const data = await response.json();
+      const goalies = data.goalies || [];
+      
+      goalies.forEach((goalie: any) => {
+        if (goalie.gamesPlayed > 0) {
+          allGoalies.push({
+            id: goalie.playerId,
+            name: goalie.firstName.default + ' ' + goalie.lastName.default,
+            teamAbbrev: team,
+            teamLogo: `https://assets.nhle.com/logos/nhl/svg/${team}_light.svg`,
+            savePct: goalie.savePercentage ? (goalie.savePercentage * 100).toFixed(2) : '0.00',
+            gamesPlayed: goalie.gamesPlayed
+          });
+        }
+      });
+    } catch (error) {
+      console.error(`Error fetching goalies for ${team}`);
+    }
   }));
+  
+  return allGoalies.sort((a, b) => parseFloat(b.savePct) - parseFloat(a.savePct)).slice(0, 50);
 }

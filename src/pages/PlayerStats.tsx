@@ -67,6 +67,7 @@ function PlayerStats() {
               <th>Rank</th>
               <th>Goalie</th>
               <th>Team</th>
+              <th>GP</th>
               <th>Save %</th>
             </tr>
           </thead>
@@ -78,6 +79,7 @@ function PlayerStats() {
                 <td>
                   <img src={goalie.teamLogo} alt={goalie.teamAbbrev} style={{ width: '40px', height: '40px' }} />
                 </td>
+                <td>{goalie.gamesPlayed}</td>
                 <td>{goalie.savePct}%</td>
               </tr>
             ))}
