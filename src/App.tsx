@@ -11,6 +11,7 @@ import MyBets from './pages/MyBets';
 import ScorePredictions from './pages/ScorePredictions';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
+import News from './pages/News';
 
 function Navigation() {
   const { user, profile, signOut } = useAuth();
@@ -20,6 +21,7 @@ function Navigation() {
       <ul style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <li><Link to="/">Home</Link></li>
+          <li><Link to="/news">News</Link></li>
           <li className="dropdown">
             <span>Stats ▾</span>
             <ul className="dropdown-menu">
@@ -59,6 +61,7 @@ function App() {
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/news" element={<News />} />
           <Route path="/divisions" element={<Divisions />} />
           <Route path="/teams" element={<TeamStats />} />
           <Route path="/players" element={<PlayerStats />} />
