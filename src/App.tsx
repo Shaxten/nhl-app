@@ -31,14 +31,13 @@ function Navigation() {
             </ul>
           </li>
           <li className="dropdown">
-            <span>Gamba ▾</span>
+           <span><Link to="/my-bets">Betting ▾</Link></span>
             <ul className="dropdown-menu">
-              <li><Link to="/betting">Betting</Link></li>
               {user && <li><Link to="/my-bets">My Bets</Link></li>}
               {user && <li><Link to="/score-predictions">Score Predictions</Link></li>}
+              <li><Link to="/leaderboard">Leaderboard</Link></li>
             </ul>
-          </li>
-          <li><Link to="/leaderboard">Leaderboard</Link></li>
+          </li>     
           {user ? (
             <li><Link to="/profile">{profile?.display_name}</Link></li>
           ) : (

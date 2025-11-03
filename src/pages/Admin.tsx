@@ -11,7 +11,7 @@ function Admin() {
     const logs: string[] = [];
 
     try {
-      logs.push('Resolving score predictions...');
+      logs.push('Resolving score predictions for ALL users...');
       const { data: pendingPredictions, error: predError } = await supabase
         .from('score_predictions')
         .select('*')
@@ -20,34 +20,29 @@ function Admin() {
       if (predError) {
         logs.push(`Error fetching predictions: ${predError.message}`);
       } else if (pendingPredictions && pendingPredictions.length > 0) {
-        logs.push(`Found ${pendingPredictions.length} pending predictions`);
+        const uniqueUsers = new Set(pendingPredictions.map(p => p.user_id));
+        logs.push(`Found ${pendingPredictions.length} pending predictions from ${uniqueUsers.size} users`);
         
         const predGameIds = [...new Set(pendingPredictions.map(p => p.game_id))];
+        logs.push(`Checking ${predGameIds.length} games...`);
         
         for (const gameId of predGameIds) {
           try {
-            logs.push(`Checking game ${gameId}...`);
             const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
             const gameData = await response.json();
-            
-            logs.push(`Game ${gameId} state: ${gameData.gameState}`);
 
             if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') {
-              logs.push(`Game ${gameId}: Not finished yet`);
+              logs.push(`Game ${gameId}: Not finished (${gameData.gameState})`);
               continue;
             }
 
             const homeScore = gameData.homeTeam?.score;
             const awayScore = gameData.awayTeam?.score;
-            logs.push(`Game ${gameId} final: Away ${awayScore} - Home ${homeScore}`);
-            
             const gamePredictions = pendingPredictions.filter(p => p.game_id === gameId);
-            logs.push(`Found ${gamePredictions.length} predictions for this game`);
+            logs.push(`Game ${gameId} FINAL: ${awayScore}-${homeScore} | Resolving ${gamePredictions.length} predictions`);
 
             for (const pred of gamePredictions) {
               const correct = pred.predicted_home_score === homeScore && pred.predicted_away_score === awayScore;
-              
-              logs.push(`Updating prediction ${pred.id}: predicted ${pred.predicted_away_score}-${pred.predicted_home_score}, actual ${awayScore}-${homeScore}`);
               
               const { error: updateError } = await supabase.from('score_predictions').update({
                 status: correct ? 'correct' : 'incorrect',
@@ -56,21 +51,21 @@ function Admin() {
               }).eq('id', pred.id);
 
               if (updateError) {
-                logs.push(`ERROR updating prediction ${pred.id}: ${updateError.message}`);
+                logs.push(`  ERROR: Prediction ${pred.id} - ${updateError.message}`);
               } else {
-                logs.push(`Prediction ${pred.id}: ${correct ? 'CORRECT' : 'INCORRECT'}`);
+                logs.push(`  ✓ Prediction ${pred.id} (User ${pred.user_id}): ${correct ? 'CORRECT' : 'INCORRECT'}`);
               }
             }
           } catch (error) {
-            logs.push(`Error for game ${gameId}: ${error}`);
+            logs.push(`ERROR game ${gameId}: ${error}`);
           }
         }
-        logs.push('Score predictions resolution complete!');
+        logs.push('✓ Score predictions resolution complete!');
       } else {
-        logs.push('No pending predictions');
+        logs.push('No pending predictions to resolve');
       }
     } catch (error) {
-      logs.push(`Error: ${error}`);
+      logs.push(`ERROR: ${error}`);
     }
 
     setResults(logs);
