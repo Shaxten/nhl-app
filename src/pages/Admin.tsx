@@ -28,7 +28,7 @@ function Admin() {
         
         for (const gameId of predGameIds) {
           try {
-            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
+            const response = await fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
             const gameData = await response.json();
 
             if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') {
@@ -99,7 +99,7 @@ function Admin() {
       for (const gameId of gameIds) {
         try {
           // Fetch game result
-          const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
+          const response = await fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
           const gameData = await response.json();
 
           // Check if game is final

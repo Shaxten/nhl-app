@@ -23,7 +23,7 @@ function Navigation() {
           <li><Link to="/">Home</Link></li>
           <li><Link to="/news">News</Link></li>
           <li className="dropdown">
-            <span>Stats ▾</span>
+            <span><Link to="/players">Stats ▾</Link></span>
             <ul className="dropdown-menu">
               <li><Link to="/divisions">Divisions</Link></li>
               <li><Link to="/teams">Team Stats</Link></li>
@@ -31,7 +31,7 @@ function Navigation() {
             </ul>
           </li>
           <li className="dropdown">
-           <span><Link to="/my-bets">Betting ▾</Link></span>
+           <span><Link to="/betting">Betting ▾</Link></span>
             <ul className="dropdown-menu">
               {user && <li><Link to="/my-bets">My Bets</Link></li>}
               {user && <li><Link to="/score-predictions">Score Predictions</Link></li>}
