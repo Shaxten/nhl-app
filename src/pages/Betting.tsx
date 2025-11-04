@@ -144,7 +144,7 @@ function Betting() {
               </div>
             </div>
             <p style={{ color: '#aaa', marginBottom: '1rem', textAlign: 'center' }}>
-              {new Date(game.startTime).toLocaleString()}
+              {new Date(game.startTime).toLocaleString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
             </p>
             <div style={{ marginTop: '1rem' }}>
               <input
