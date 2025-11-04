@@ -116,7 +116,7 @@ function ScorePredictions() {
               </td>
               <td>
                 <span style={{
-                  color: pred.status === 'correct' ? '#4a9eff' : pred.status === 'incorrect' ? '#ff4a4a' : '#aaa'
+                          color: pred.status === 'correct' ? '#f6e4ad' : pred.status === 'incorrect' ? '#ff4a4a' : '#aaa'
                 }}>
                   {pred.status}
                 </span>

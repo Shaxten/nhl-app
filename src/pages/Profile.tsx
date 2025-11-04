@@ -41,7 +41,7 @@ function Profile() {
             <p>Bets Lost</p>
           </div>
           <div className="stat-box">
-            <h3 style={{ color: (profile.total_winnings || 0) >= 0 ? '#4a9eff' : '#ff4a4a' }}>
+                      <h3 style={{ color: (profile.total_winnings || 0) >= 0 ? '#f6e4ad' : '#ff4a4a' }}>
               {(profile.total_winnings || 0) >= 0 ? '+' : ''}{profile.total_winnings || 0}
             </h3>
             <p>Total Winnings</p>

@@ -33,7 +33,7 @@ function MyBets() {
       const betsWithTeams = await Promise.all(
         data.map(async (bet) => {
           try {
-            const response = await fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/gamecenter/${bet.game_id}/landing`);
+            const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${bet.game_id}/landing`);
             const gameData = await response.json();
             return {
               ...bet,
@@ -94,7 +94,7 @@ function MyBets() {
               <td>{bet.amount}</td>
               <td>
                 <span style={{ 
-                  color: bet.status === 'won' ? '#4a9eff' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
+                          color: bet.status === 'won' ? '#f6e4ad' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
                 }}>
                   {bet.status}
                 </span>

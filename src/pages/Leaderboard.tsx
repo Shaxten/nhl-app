@@ -96,7 +96,7 @@ function Leaderboard() {
                   ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)}%`
                   : '0%'}
               </td>
-              <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#4a9eff' : '#ff4a4a' }}>
+                  <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#f6e4ad' : '#ff4a4a' }}>
                 {(leader.total_winnings || 0) >= 0 ? '+' : ''}{leader.total_winnings || 0}
               </td>
             </tr>

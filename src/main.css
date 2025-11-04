@@ -13,8 +13,12 @@ nav ul {
     max-width: 1200px;
 }
 
-th, h1, h2, h3 {
+h1, h2, h3 {
     color: #f6e4ad;
+}
+
+th {
+    color:#c3b27f 
 }
 
     h3 a, .division-card a,  ul  li a:hover, li span:hover, li span:focus{
@@ -108,9 +112,12 @@ nav ul li{
 
 .fade {
     opacity: 0;
-    animation: fade1 4s 2s forwards;
+    animation: fade1 2s 1s ease-in forwards;
 }
 
+.prediction th{
+    color:white;
+}
 
 @keyframes moveUp{
     0%{
