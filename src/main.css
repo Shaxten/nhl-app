@@ -139,3 +139,39 @@ nav ul li{
         opacity: 1;
     }
 }
+
+/* Responsive Navigation */
+@media (min-width: 1200px) {
+    .mobile-nav {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1199px) {
+    .desktop-nav {
+        display: none !important;
+    }
+    nav {
+        margin: 0;
+    }
+    .grid {
+        grid-template-columns: 100%;
+    }
+
+    .buttons {
+        margin-top: 1.5rem;
+        display: grid;
+        grid-template-columns: 100%;
+    }
+
+    .bouton1 {
+        margin-bottom: 1rem;
+        margin-right: 0;
+        width: auto;
+    }
+
+    .bouton2 {
+        margin-bottom: 2rem;
+        width: auto;
+    }
+}
