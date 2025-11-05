@@ -46,10 +46,10 @@ function News() {
                 {item.title}
               </a>
             </h3>
-            <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+            <p className="pSmall" style={{ color: '#aaa', marginTop: '0.5rem' }}>
               {new Date(item.pubDate).toLocaleDateString()} - {new Date(item.pubDate).toLocaleTimeString()}
             </p>
-            <p style={{ marginTop: '1rem', lineHeight: '1.6' }}>
+            <p className="news-description" style={{ marginTop: '1rem' }}>
               {item.description.replace(/<[^>]*>/g, '').substring(0, 200)}...
             </p>
             <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ color: '#4a9eff', marginTop: '0.5rem', display: 'inline-block' }}>

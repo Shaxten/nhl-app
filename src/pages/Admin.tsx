@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabase';
+import { clearCache } from '../utils/fetchWithFallback';
 
 function Admin() {
   const [processing, setProcessing] = useState(false);
@@ -227,13 +228,19 @@ function Admin() {
         >
           Refresh Page
         </button>
+        <button 
+          onClick={() => { clearCache(); alert('Cache cleared!'); }} 
+          style={{ background: '#ff8c00' }}
+        >
+          Clear Cache
+        </button>
       </div>
 
       {results.length > 0 && (
         <div style={{ marginTop: '2rem', background: '#1a1f3a', padding: '1rem', borderRadius: '8px' }}>
           <h3>Results:</h3>
           {results.map((log, i) => (
-            <p key={i} style={{ margin: '0.5rem 0', fontFamily: 'monospace', fontSize: '0.9rem' }}>
+              <p key={i} className="pSmall" style={{ margin: '0.5rem 0', fontFamily: 'monospace' }}>
               {log}
             </p>
           ))}

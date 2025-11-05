@@ -6,7 +6,7 @@ function Home() {
           <div className="grid">
               <div>
                   <h1 className="anim">Statistiques de hockey</h1>
-                  <p className="anim2" style={{ fontSize: '1.2rem', marginTop: '2rem', lineHeight: '1.8', maxWidth: '80%', marginRight: '1rem' }}>
+                  <p className="anim2" style={{ marginTop: '2rem', maxWidth: '80%', marginRight: '1rem' }}>
                     Bienvenue au Statistiques de hockey, l'application web qui vous permet de visualiser les statistiques de hockey pour les equipes les joueurs et qui vous permet de placer des paries avec de l'argent virtuel!
                   </p>
                   <div className="buttons">                 

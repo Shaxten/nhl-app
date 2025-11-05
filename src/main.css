@@ -1,54 +1,3 @@
-
-nav {
-    text-align: -webkit-center;
-    background: #1a1a1a;
-    border-style: solid;
-    border-width: 0px 0px 1px 0px;
-    padding: 1rem;
-    margin: 0 10rem;
-    box-shadow: none;
-}
-
-nav ul {
-    max-width: 1200px;
-}
-
-h1, h2, h3 {
-    color: #f6e4ad;
-}
-
-th {
-    color:#c3b27f 
-}
-
-    h3 a, .division-card a,  ul  li a:hover, li span:hover, li span:focus{
-        color: #f6e4ad !important;
-    }
-
-button {
-    background: #f6e4ad;
-    color: black;
-}
-
-    button:hover {
-        background: #c3b27f;
-        color: black;
-    }
-
-a{
-    text-decoration: none;
-    transition-duration: 0.4s;
-}
-
-nav ul li{
-    margin: 0rem 0.6rem;
-    text-align: start;
-}
-
-    nav ul li a:hover {
-        color: #f6e4ad;
-    }
-
 .grid{
     display: grid;
     grid-template-columns: 50% 50%;
@@ -58,120 +7,63 @@ nav ul li{
     max-height: 600px;
 }
 
+.divisions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.division-card {
+    background: #2a2a2a;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.team-stats {
+    background: #2a2a2a;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.stat-box {
+    background: #333;
+    padding: 1rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+    .stat-box h3 {
+        font-size: 2rem;
+        margin-bottom: 0.25rem;
+        color: white;
+    }
+
+    .stat-box p {
+        color: #aaa;
+        font-size: 0.9rem;
+    }
+
 .mt{
     margin-top: 5rem;
-}
-
-.anim{
-    opacity: 0;
-    animation: moveUp 2s 0.5s forwards;
-}
-
-.anim2 {
-    opacity: 0;
-    animation: moveUp 2s 1s forwards;
-}
-
-.buttons {
-    margin-top: 3rem;
-    opacity: 0;
-    animation: moveUp 2s 1.5s forwards;
-}
-
-.bouton1 {
-    background-color: #f6e4ad;
-    padding: 0.7rem;
-    margin-right: 1rem;
-    color: black;
-    border-color: #f6e4ad;
-    border-style: solid;
-}
-
-.bouton2 {
-    border-color: #f6e4ad;
-    border-style: solid;
-    padding: 0.7rem;
-    color: #f6e4ad;
-}
-
-
-.bouton2:hover {
-    background-color: #f6e4ad;
-    padding: 0.7rem;
-    margin-right: 1rem;
-    color: black;
-}
-
-.bouton1:hover {
-    border-color: #f6e4ad;
-    border-style: solid;
-    padding: 0.7rem;
-    color: #f6e4ad;
-    background-color: transparent;
-}
-
-.fade {
-    opacity: 0;
-    animation: fade1 2s 1s ease-in forwards;
 }
 
 .prediction th{
     color:white;
 }
 
-@keyframes moveUp{
-    0%{
-        opacity: 0;
-        transform: translateY(100px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0px);
-    }
-}
-
-@keyframes fade1 {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-/* Responsive Navigation */
-@media (min-width: 1200px) {
-    .mobile-nav {
-        display: none !important;
-    }
-}
-
-@media (max-width: 1199px) {
-    .desktop-nav {
-        display: none !important;
-    }
-    nav {
-        margin: 0;
-    }
-    .grid {
-        grid-template-columns: 100%;
-    }
-
-    .buttons {
-        margin-top: 1.5rem;
-        display: grid;
-        grid-template-columns: 100%;
-    }
-
-    .bouton1 {
-        margin-bottom: 1rem;
-        margin-right: 0;
-        width: auto;
-    }
-
-    .bouton2 {
-        margin-bottom: 2rem;
-        width: auto;
+@media (max-width: 768px) {
+    .divisions-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }

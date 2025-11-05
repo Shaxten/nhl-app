@@ -1,0 +1,130 @@
+/* Navigation bar */
+
+nav {
+    padding: 1rem;
+    text-align: -webkit-center;
+    background: #1a1a1a;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+    padding: 1rem;
+    margin: 0 10rem;
+    box-shadow: none;
+}
+
+nav ul {
+    max-width: 1200px;
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+nav a:hover, nav a.active {
+    color: #4a9eff;
+}
+
+nav ul li {
+    margin: 0rem 0.6rem;
+    text-align: start;
+}
+
+nav ul li a:hover {
+    color: #f6e4ad;
+}
+
+.dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+    .dropdown span {
+        color: #fff;
+        font-weight: 500;
+        padding: 0.5rem 0;
+        display: block;
+    }
+
+    .dropdown:hover span {
+        color: #4a9eff;
+    }
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0rem);
+    left: 0;
+    background: #333;
+    min-width: 180px;
+    border-radius: 4px;
+    padding: 0.5rem 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    z-index: 1000;
+    list-style: none;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu li {
+    list-style: none;
+    padding: 0;
+}
+
+    .dropdown-menu li:hover {
+        background: #2a2a2a;
+    }
+
+.dropdown-menu a {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    color: #fff;
+    text-decoration: none;
+}
+
+    .dropdown-menu a:hover {
+        color: #4a9eff;
+    }
+
+
+/* Responsive Navigation */
+@media (min-width: 1200px) {
+    .mobile-nav {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1199px) {
+    .desktop-nav {
+        display: none !important;
+    }
+
+    nav {
+        margin: 0;
+    }
+
+    .grid {
+        grid-template-columns: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    nav {
+        padding: 0.75rem;
+    }
+
+        nav ul {
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+}
+
+/* -------------- */

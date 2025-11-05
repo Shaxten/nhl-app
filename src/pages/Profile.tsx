@@ -64,7 +64,7 @@ function Profile() {
             </div>
           ) : (
             <div style={{ marginTop: '1rem' }}>
-              <p style={{ fontSize: '1.2rem' }}>{profile.display_name}</p>
+              <p className="profile-display-name">{profile.display_name}</p>
               <button onClick={() => setEditing(true)} style={{ marginTop: '1rem' }}>
                 Edit Name
               </button>

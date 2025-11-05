@@ -117,7 +117,7 @@ function Betting() {
     <div className="container">
       <h1>Upcoming Games - Place Your Bets</h1>
       {profile && (
-        <div style={{ marginTop: '1rem', fontSize: '1.2rem' }}>
+        <div className="betting-currency" style={{ marginTop: '1rem' }}>
           Available Currency: <strong>{profile.currency}</strong>
         </div>
       )}
@@ -134,13 +134,13 @@ function Betting() {
               <div style={{ textAlign: 'center' }}>
                 <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '80px', height: '80px' }} />
                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeam}</p>
-                <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '0.25rem' }}>{game.awayRecord}</p>
+                <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.awayRecord}</p>
               </div>
-              <div style={{ fontSize: '2rem', fontWeight: 'bold' }}>@</div>
+              <div className="game-vs" style={{ fontWeight: 'bold' }}>@</div>
               <div style={{ textAlign: 'center' }}>
                 <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeam}</p>
-                <p style={{ color: '#aaa', fontSize: '0.9rem', marginTop: '0.25rem' }}>{game.homeRecord}</p>
+                <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
               </div>
             </div>
             <p style={{ color: '#aaa', marginBottom: '1rem', textAlign: 'center' }}>

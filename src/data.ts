@@ -1,5 +1,6 @@
 import { Team, Player } from './types';
 import { fetchStandings, fetchSkaterStats, fetchSkaterStatsDetailed, getCurrentSeason } from './api';
+import { fetchWithFallback } from './utils/fetchWithFallback';
 
 export async function getTeams(): Promise<Team[]> {
   const data = await fetchStandings();
@@ -21,7 +22,7 @@ export async function getTeams(): Promise<Team[]> {
 export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
   try {
     const season = getCurrentSeason();
-    const response = await fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/club-stats/${teamAbbrev}/${season}/2`);
+    const response = await fetchWithFallback(`https://api-web.nhle.com/v1/club-stats/${teamAbbrev}/${season}/2`);
     const data = await response.json();
     
     const skaters = data.skaters || [];
@@ -55,7 +56,7 @@ export async function getTeamPlayers(teamAbbrev: string): Promise<Player[]> {
 export async function getUpcomingGames() {
   const today = new Date().toISOString().split('T')[0];
   const [scheduleResponse, standingsData] = await Promise.all([
-    fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/schedule/${today}`),
+    fetchWithFallback(`https://api-web.nhle.com/v1/schedule/${today}`),
     fetchStandings()
   ]);
   const data = await scheduleResponse.json();
@@ -141,7 +142,7 @@ export async function getTopGoalies(): Promise<any[]> {
   
   await Promise.all(teams.map(async (team) => {
     try {
-      const response = await fetch(`https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1/club-stats/${team}/${season}/2`);
+      const response = await fetchWithFallback(`https://api-web.nhle.com/v1/club-stats/${team}/${season}/2`);
       const data = await response.json();
       const goalies = data.goalies || [];
       

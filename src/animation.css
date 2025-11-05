@@ -1,0 +1,41 @@
+/* Page accueil animation */
+
+.anim {
+    opacity: 0;
+    animation: moveUp 2s 0.5s forwards;
+}
+
+.anim2 {
+    opacity: 0;
+    animation: moveUp 2s 1s forwards;
+}
+
+.fade {
+    opacity: 0;
+    animation: fade1 2s 1s ease-in forwards;
+}
+
+
+@keyframes moveUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+@keyframes fade1 {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* ---------------------------- */
