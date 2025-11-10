@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
 function Auth() {
+  const { t } = useLanguage();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,12 +30,12 @@ function Auth() {
   return (
     <div className="container">
       <div style={{ maxWidth: '400px', margin: '4rem auto' }}>
-        <h1>{isSignUp ? 'Sign Up' : 'Sign In'}</h1>
+        <h1>{isSignUp ? t.auth.signUp : t.auth.signIn}</h1>
         <form onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
           <div style={{ marginBottom: '1rem' }}>
             <input
               type="email"
-              placeholder="Email"
+              placeholder={t.auth.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -43,7 +45,7 @@ function Auth() {
           <div style={{ marginBottom: '1rem' }}>
             <input
               type="password"
-              placeholder="Password"
+              placeholder={t.auth.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -52,14 +54,14 @@ function Auth() {
           </div>
           {error && <p style={{ color: 'red', marginBottom: '1rem' }}>{error}</p>}
           <button type="submit" style={{ width: '100%', marginBottom: '1rem' }}>
-            {isSignUp ? 'Sign Up' : 'Sign In'}
+            {isSignUp ? t.auth.signUp : t.auth.signIn}
           </button>
           <button
             type="button"
             onClick={() => setIsSignUp(!isSignUp)}
             style={{ width: '100%', background: '#252b4a' }}
           >
-            {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+            {isSignUp ? `${t.auth.alreadyAccount} ${t.auth.signIn}` : `${t.auth.noAccount} ${t.auth.signUp}`}
           </button>
         </form>
       </div>

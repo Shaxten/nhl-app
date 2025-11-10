@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
 
 interface Bet {
@@ -15,6 +16,7 @@ interface Bet {
 
 function MyBets() {
   const { user, refreshProfile } = useAuth();
+  const { language, t } = useLanguage();
   const [bets, setBets] = useState<Bet[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,36 +72,38 @@ function MyBets() {
     loadBets();
   }
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
+  if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
-      <h1>My Bets</h1>
+      <h1>{t.myBets.title}</h1>
       <table style={{ marginTop: '2rem' }}>
         <thead>
           <tr>
-            <th>Game</th>
-            <th>Your Pick</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Date</th>
-            <th>Action</th>
+            <th>{t.myBets.game}</th>
+            <th>{t.myBets.betOn}</th>
+            <th>{t.myBets.amount}</th>
+            <th>{t.myBets.status}</th>
+            <th>{language === 'fr' ? 'Date' : 'Date'}</th>
+            <th>{language === 'fr' ? 'Action' : 'Action'}</th>
           </tr>
         </thead>
         <tbody>
           {bets.map(bet => (
             <tr key={bet.id}>
               <td>{bet.away_team} @ {bet.home_team}</td>
-              <td>{bet.team_choice}</td>
-              <td>{bet.amount}</td>
+              <td>
+                <img src={`https://assets.nhle.com/logos/nhl/svg/${bet.team_choice}_light.svg`} alt={bet.team_choice} style={{ width: '40px', height: '40px' }} />
+              </td>
+              <td>{bet.amount} MC</td>
               <td>
                 <span style={{ 
-                          color: bet.status === 'won' ? '#f6e4ad' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
+                          color: bet.status === 'won' ? '#4ade80' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
                 }}>
-                  {bet.status}
+                  {bet.status === 'pending' ? t.myBets.pending : bet.status === 'won' ? t.myBets.won : t.myBets.lost}
                 </span>
               </td>
-              <td>{new Date(bet.created_at).toLocaleString()}</td>
+              <td>{new Date(bet.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
               <td>
                 {bet.status === 'pending' && (
                   <button 

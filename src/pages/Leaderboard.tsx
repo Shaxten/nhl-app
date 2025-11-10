@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
 
 interface LeaderboardEntry {
@@ -13,6 +14,7 @@ interface LeaderboardEntry {
 }
 
 function Leaderboard() {
+  const { t, language } = useLanguage();
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,47 +59,47 @@ function Leaderboard() {
     return ((won / total) * 100).toFixed(1);
   }
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
+  if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
-      <h1>Leaderboard</h1>
+      <h1>{t.leaderboard.title}</h1>
       <button onClick={() => { setLoading(true); fetchLeaderboard(); }} style={{ marginTop: '1rem' }}>
-        Refresh
+        {language === 'fr' ? 'Actualiser' : 'Refresh'}
       </button>
       <table style={{ marginTop: '2rem' }}>
         <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Player</th>
-            <th>Currency</th>
-            <th>Bets Won</th>
-            <th>Bets Lost</th>
-            <th>Win Rate</th>
-            <th>Total Predictions</th>
-            <th>Correct Predictions</th>
-            <th>Prediction Accuracy</th>
-            <th>Total Winnings</th>
+          <tr style={{ textAlign: 'right' }}>
+            <th>{t.leaderboard.rank}</th>
+            <th>{t.leaderboard.player}</th>
+            <th>{t.leaderboard.currency}</th>
+            <th>{language === 'fr' ? 'Bets gagnés' : 'Bets Won'}</th>
+            <th>{language === 'fr' ? 'Bets perdus' : 'Bets Lost'}</th>
+            <th>{language === 'fr' ? 'Taux de victoire' : 'Win Rate'}</th>
+            <th>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</th>
+            <th>{language === 'fr' ? 'Prédictions correctes' : 'Correct Predictions'}</th>
+            <th>{language === 'fr' ? 'Précision' : 'Prediction Accuracy'}</th>
+            <th>{language === 'fr' ? 'Gains totaux' : 'Total Winnings'}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="tableright">
           {leaders.map((leader, index) => (
-            <tr key={index}>
+            <tr key={index} style={{ textAlign: 'right' }}>
               <td>{index + 1}</td>
               <td>{leader.display_name}</td>
-              <td>{leader.currency}</td>
+              <td>{leader.currency} MC</td>
               <td>{leader.bets_won || 0}</td>
               <td>{leader.bets_lost || 0}</td>
-              <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)}%</td>
+              <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)} %</td>
               <td>{leader.score_predictions_total || 0}</td>
               <td>{leader.score_predictions_correct || 0}</td>
               <td>
                 {(leader.score_predictions_total || 0) > 0 
-                  ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)}%`
-                  : '0%'}
+                  ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)} %`
+                  : '0 %'}
               </td>
-                  <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#f6e4ad' : '#ff4a4a' }}>
-                {(leader.total_winnings || 0) >= 0 ? '+' : ''}{leader.total_winnings || 0}
+                  <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#4ade80' : '#ff4a4a' }}>
+                {(leader.total_winnings || 0) >= 0 ? '+ ' : (leader.total_winnings || 0) < 0 ? '- ' : ''}{Math.abs(leader.total_winnings || 0)}
               </td>
             </tr>
           ))}

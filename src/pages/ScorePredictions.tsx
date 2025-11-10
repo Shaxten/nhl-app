@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
 
 interface Prediction {
@@ -17,6 +18,7 @@ interface Prediction {
 
 function ScorePredictions() {
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [stats, setStats] = useState({ total: 0, correct: 0 });
   const [loading, setLoading] = useState(true);
@@ -72,33 +74,33 @@ function ScorePredictions() {
     return minutesPassed <= 15;
   }
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
+  if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
-      <h1>My Score Predictions</h1>
+      <h1>{t.scorePredictions.title}</h1>
       <div className="stats-summary" style={{ marginTop: '2rem' }}>
         <div className="stat-box">
           <h3>{stats.total}</h3>
-          <p>Total Predictions</p>
+          <p>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</p>
         </div>
         <div className="stat-box">
           <h3>{stats.correct}</h3>
-          <p>Correct</p>
+          <p>{language === 'fr' ? 'Correct' : 'Correct'}</p>
         </div>
         <div className="stat-box">
-          <h3>{stats.total > 0 ? ((stats.correct / stats.total) * 100).toFixed(1) : 0}%</h3>
-          <p>Accuracy</p>
+          <h3>{stats.total > 0 ? ((stats.correct / stats.total) * 100).toFixed(1) : 0} %</h3>
+          <p>{language === 'fr' ? 'Précision' : 'Accuracy'}</p>
         </div>
       </div>
 
       <table style={{ marginTop: '2rem' }}>
         <thead>
           <tr>
-            <th>Game</th>
-            <th>Your Prediction</th>
-            <th>Actual Score</th>
-            <th>Status</th>
+            <th>{t.scorePredictions.game}</th>
+            <th>{t.scorePredictions.prediction}</th>
+            <th>{t.scorePredictions.actual}</th>
+            <th>{t.scorePredictions.status}</th>
             <th>Date</th>
             <th>Action</th>
           </tr>
@@ -116,16 +118,16 @@ function ScorePredictions() {
               </td>
               <td>
                 <span style={{
-                          color: pred.status === 'correct' ? '#f6e4ad' : pred.status === 'incorrect' ? '#ff4a4a' : '#aaa'
+                          color: pred.status === 'correct' ? '#a8d5ff' : pred.status === 'incorrect' ? '#ff4a4a' : '#aaa'
                 }}>
-                  {pred.status}
+                  {pred.status === 'pending' ? t.scorePredictions.pending : pred.status === 'correct' ? t.scorePredictions.correct : t.scorePredictions.incorrect}
                 </span>
               </td>
-              <td>{new Date(pred.created_at).toLocaleDateString()}</td>
+              <td>{new Date(pred.created_at).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</td>
               <td>
                 {canEdit(pred) ? (
                   <button onClick={() => handleEdit(pred.id)} style={{ padding: '0.25rem 0.5rem' }}>
-                    Edit
+                    {t.scorePredictions.edit}
                   </button>
                 ) : (
                   <span style={{ color: '#666' }}>-</span>

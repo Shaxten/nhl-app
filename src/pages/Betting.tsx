@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getUpcomingGames, placeBet } from '../data';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
@@ -13,10 +14,13 @@ interface Game {
   awayTeamLogo?: string;
   homeRecord?: string;
   awayRecord?: string;
+  homeTeamName?: string;
+  awayTeamName?: string;
 }
 
 function Betting() {
   const { user, profile, refreshProfile } = useAuth();
+  const { language, t } = useLanguage();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [betAmount, setBetAmount] = useState<{ [key: number]: number }>({});
@@ -44,7 +48,7 @@ function Betting() {
       .single();
 
     if (existing) {
-      alert('You already have a prediction for this game. Use the Score Predictions page to edit it.');
+      alert(t.betting.alreadyPredicted);
       return;
     }
 
@@ -52,7 +56,7 @@ function Betting() {
     const homeScore = parseInt((document.getElementById(`home-${gameId}`) as HTMLInputElement).value);
 
     if (isNaN(awayScore) || isNaN(homeScore)) {
-      alert('Please enter valid scores');
+      alert(t.betting.enterValidScores);
       return;
     }
 
@@ -66,11 +70,11 @@ function Betting() {
         predicted_away_score: awayScore,
         status: 'pending'
       });
-      alert('Score prediction submitted!');
+      alert(t.betting.predictionSubmitted);
       (document.getElementById(`away-${gameId}`) as HTMLInputElement).value = '';
       (document.getElementById(`home-${gameId}`) as HTMLInputElement).value = '';
     } catch (error) {
-      alert('Failed to submit prediction');
+      alert(t.betting.failedPrediction);
     }
   }
 
@@ -87,14 +91,14 @@ function Betting() {
       const timeDiff = (now.getTime() - gameTime.getTime()) / (1000 * 60);
       
       if (timeDiff > 30) {
-        alert('Betting closed: Game started more than 30 minutes ago');
+        alert(t.betting.bettingClosed + ': Game started more than 30 minutes ago');
         return;
       }
     }
 
     const amount = betAmount[gameId] || 0;
     if (amount <= 0 || amount > profile.currency) {
-      alert('Invalid bet amount');
+      alert(t.betting.invalidAmount);
       return;
     }
 
@@ -104,21 +108,21 @@ function Betting() {
       
       await placeBet(user.id, gameId, teamChoice === 'home' ? game.homeTeam : game.awayTeam, amount, game.homeTeam, game.awayTeam);
       await refreshProfile();
-      alert('Bet placed successfully!');
+      alert(t.betting.betPlaced);
       setBetAmount({ ...betAmount, [gameId]: 0 });
     } catch (error) {
-      alert('Failed to place bet');
+      alert(t.betting.failedBet);
     }
   }
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
+  if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
-      <h1>Upcoming Games - Place Your Bets</h1>
+      <h1>{t.betting.title}</h1>
       {profile && (
         <div className="betting-currency" style={{ marginTop: '1rem' }}>
-          Available Currency: <strong>{profile.currency}</strong>
+          {t.betting.availableCurrency}: <strong>{profile.currency} MC</strong>
         </div>
       )}
       <div style={{ marginTop: '2rem' }}>
@@ -133,23 +137,23 @@ function Betting() {
             <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '1rem' }}>
               <div style={{ textAlign: 'center' }}>
                 <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '80px', height: '80px' }} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeam}</p>
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeamName || game.awayTeam}</p>
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.awayRecord}</p>
               </div>
               <div className="game-vs" style={{ fontWeight: 'bold' }}>@</div>
               <div style={{ textAlign: 'center' }}>
                 <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeam}</p>
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeamName || game.homeTeam}</p>
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
               </div>
             </div>
             <p style={{ color: '#aaa', marginBottom: '1rem', textAlign: 'center' }}>
-              {new Date(game.startTime).toLocaleString(undefined, { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+              {new Date(game.startTime).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
             </p>
             <div style={{ marginTop: '1rem' }}>
               <input
                 type="number"
-                placeholder="Bet amount"
+                placeholder={t.betting.betAmount}
                 value={betAmount[game.id] || ''}
                 onChange={(e) => setBetAmount({ ...betAmount, [game.id]: Number(e.target.value) })}
                 style={{ padding: '0.5rem', marginRight: '1rem', width: '150px' }}
@@ -157,20 +161,20 @@ function Betting() {
               />
             </div>
             {bettingClosed ? (
-              <p style={{ color: '#ff4a4a', marginTop: '1rem' }}>Betting closed</p>
+              <p style={{ color: '#ff4a4a', marginTop: '1rem' }}>{t.betting.bettingClosed}</p>
             ) : (
               <>
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
                   <button onClick={() => handleBet(game.id, 'away')}>
-                    Bet on {game.awayTeam}
+                    {t.betting.betOn} {game.awayTeam}
                   </button>
                   <button onClick={() => handleBet(game.id, 'home')}>
-                    Bet on {game.homeTeam}
+                    {t.betting.betOn} {game.homeTeam}
                   </button>
                 </div>
                 {(game.homeTeam === 'MTL' || game.awayTeam === 'MTL') && (
                   <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
-                    <h4 style={{ marginBottom: '0.5rem' }}>Predict Final Score (MTL Game)</h4>
+                    <h4 style={{ marginBottom: '0.5rem' }}>{t.betting.predictScore}</h4>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <input
                         type="number"
@@ -188,7 +192,7 @@ function Betting() {
                         id={`home-${game.id}`}
                       />
                       <button onClick={() => handleScorePrediction(game.id, game.homeTeam, game.awayTeam)}>
-                        Submit Prediction
+                        {t.betting.submitPrediction}
                       </button>
                     </div>
                   </div>

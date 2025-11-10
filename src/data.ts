@@ -80,7 +80,9 @@ export async function getUpcomingGames() {
     homeTeamLogo: game.homeTeam.logo,
     awayTeamLogo: game.awayTeam.logo,
     homeRecord: teamRecords.get(game.homeTeam.abbrev) || '',
-    awayRecord: teamRecords.get(game.awayTeam.abbrev) || ''
+    awayRecord: teamRecords.get(game.awayTeam.abbrev) || '',
+    homeTeamName: game.homeTeam.placeName?.default + ' ' + game.homeTeam.commonName?.default,
+    awayTeamName: game.awayTeam.placeName?.default + ' ' + game.awayTeam.commonName?.default
   }));
 }
 

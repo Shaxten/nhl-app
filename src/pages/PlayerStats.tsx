@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getTopPlayers, getTopGoalies } from '../data';
 import { Player } from '../types';
 
 type FilterType = 'points' | 'goals' | 'assists' | 'goalies';
 
 function PlayerStats() {
+  const { t, language } = useLanguage();
   const [filter, setFilter] = useState<FilterType>('points');
   const [players, setPlayers] = useState<Player[]>([]);
   const [goalies, setGoalies] = useState<any[]>([]);
@@ -24,7 +26,7 @@ function PlayerStats() {
     });
   }, []);
 
-  if (loading) return <div className="container"><h1>Loading...</h1></div>;
+  if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   const sortedPlayers = filter === 'goalies' 
     ? goalies.slice(0, 20)
@@ -32,31 +34,31 @@ function PlayerStats() {
 
   return (
     <div className="container">
-      <h1>Top 20 {filter === 'goalies' ? 'Goalies' : 'Players'}</h1>
+      <h1>{t.playerStats.title}</h1>
       <div className="filters">
         <button 
           className={filter === 'points' ? 'active' : ''} 
           onClick={() => setFilter('points')}
         >
-          Points
+          {t.playerStats.points}
         </button>
         <button 
           className={filter === 'goals' ? 'active' : ''} 
           onClick={() => setFilter('goals')}
         >
-          Goals
+          {t.playerStats.goals}
         </button>
         <button 
           className={filter === 'assists' ? 'active' : ''} 
           onClick={() => setFilter('assists')}
         >
-          Assists
+          {t.playerStats.assists}
         </button>
         <button 
           className={filter === 'goalies' ? 'active' : ''} 
           onClick={() => setFilter('goalies')}
         >
-          Goalies (Save %)
+          {language === 'fr' ? 'Gardiens (% Arrêts)' : 'Goalies (Save %)'}
         </button>
       </div>
 
@@ -64,11 +66,11 @@ function PlayerStats() {
         <table>
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Goalie</th>
-              <th>Team</th>
-              <th>GP</th>
-              <th>Save %</th>
+              <th>{language === 'fr' ? 'Rang' : 'Rank'}</th>
+              <th>{language === 'fr' ? 'Gardien' : 'Goalie'}</th>
+              <th>{language === 'fr' ? 'Équipe' : 'Team'}</th>
+              <th>{language === 'fr' ? 'PJ' : 'GP'}</th>
+              <th>{language === 'fr' ? '% Arrêts' : 'Save %'}</th>
             </tr>
           </thead>
           <tbody>
@@ -89,11 +91,11 @@ function PlayerStats() {
         <table>
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Player</th>
-              <th>Team</th>
-              <th>Goals</th>
-              <th>Assists</th>
+              <th>{language === 'fr' ? 'Rang' : 'Rank'}</th>
+              <th>{language === 'fr' ? 'Joueur' : 'Player'}</th>
+              <th>{language === 'fr' ? 'Équipe' : 'Team'}</th>
+              <th>{language === 'fr' ? 'Buts' : 'Goals'}</th>
+              <th>{language === 'fr' ? 'Passes' : 'Assists'}</th>
               <th>Points</th>
             </tr>
           </thead>

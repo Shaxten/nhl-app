@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
 import { clearCache } from '../utils/fetchWithFallback';
 
 function Admin() {
+  const { t } = useLanguage();
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState<string[]>([]);
 
@@ -204,7 +206,7 @@ function Admin() {
 
   return (
     <div className="container">
-      <h1>Admin - Resolve Bets</h1>
+      <h1>{t.admin.title}</h1>
       <p style={{ marginTop: '1rem', color: '#aaa' }}>
         This will check all pending bets and resolve them based on game results.
       </p>

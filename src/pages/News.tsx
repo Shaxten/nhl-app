@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface NewsItem {
   title: string;
@@ -8,20 +9,34 @@ interface NewsItem {
 }
 
 function News() {
+  const { language } = useLanguage();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchNews();
-  }, []);
+  }, [language]);
 
   async function fetchNews() {
     try {
-      const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.espn.com/espn/rss/nhl/news');
-      const data = await response.json();
-      
-      if (data.status === 'ok' && data.items) {
-        setNews(data.items.slice(0, 20));
+      if (language === 'fr') {
+        // RDS RSS feed
+        const rssUrl = 'https://www.rds.ca/arc/outboundfeeds/rss/category/hockey/lnh/?outputType=xml';
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+        const data = await response.json();
+        
+        if (data.status === 'ok' && data.items) {
+          setNews(data.items.slice(0, 20));
+        }
+      } else {
+        // ESPN RSS feed
+        const rssUrl = 'https://www.espn.com/espn/rss/nhl/news';
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`);
+        const data = await response.json();
+        
+        if (data.status === 'ok' && data.items) {
+          setNews(data.items.slice(0, 20));
+        }
       }
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -33,9 +48,9 @@ function News() {
 
   return (
     <div className="container">
-      <h1>NHL News</h1>
-      <button onClick={() => { setLoading(true); fetchNews(); }} style={{ marginTop: '1rem' }}>
-        Refresh
+      <h1>{language === 'fr' ? 'Les nouvelles dans le monde de la LNH' : 'News from the NHL world'}</h1>
+      <button onClick={() => { setLoading(true); fetchNews(); }} style={{ marginTop: '1rem', cursor: 'pointer' }}>
+        {language === 'fr' ? 'Actualiser' : 'Refresh'}
       </button>
       
       <div style={{ marginTop: '2rem' }}>
@@ -53,7 +68,7 @@ function News() {
               {item.description.replace(/<[^>]*>/g, '').substring(0, 200)}...
             </p>
             <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ color: '#4a9eff', marginTop: '0.5rem', display: 'inline-block' }}>
-              Read more →
+              {language === 'fr' ? 'Lire la suite →' : 'Read more →'}
             </a>
           </div>
         ))}
