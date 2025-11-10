@@ -151,6 +151,10 @@ const translations: Record<Language, Translations> = {
       signOut: 'Sign out',
       admin: 'Admin',
     },
+    home: {
+      title: 'NHL Stats & Betting',
+      welcome: 'Welcome to NHL Stats',
+    },
     divisions: {
       title: 'Division Standings',
       team: 'Team',
