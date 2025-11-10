@@ -12,6 +12,7 @@ interface Bet {
   created_at: string;
   home_team?: string;
   away_team?: string;
+  game_start_time?: string;
 }
 
 function MyBets() {
@@ -40,7 +41,8 @@ function MyBets() {
             return {
               ...bet,
               home_team: gameData.homeTeam?.abbrev || 'N/A',
-              away_team: gameData.awayTeam?.abbrev || 'N/A'
+              away_team: gameData.awayTeam?.abbrev || 'N/A',
+              game_start_time: gameData.startTimeUTC
             };
           } catch {
             return { ...bet, home_team: 'N/A', away_team: 'N/A' };
@@ -105,14 +107,21 @@ function MyBets() {
               </td>
               <td>{new Date(bet.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
               <td>
-                {bet.status === 'pending' && (
-                  <button 
-                    onClick={() => cancelBet(bet.id, bet.amount)}
-                    style={{ background: '#ff4a4a' }}
-                  >
-                    Cancel
-                  </button>
-                )}
+                {bet.status === 'pending' && (() => {
+                  const gameStartTime = bet.game_start_time ? new Date(bet.game_start_time) : null;
+                  const now = new Date();
+                  const fifteenMinutesAfterStart = gameStartTime ? new Date(gameStartTime.getTime() + 15 * 60 * 1000) : null;
+                  const canCancel = !fifteenMinutesAfterStart || now < fifteenMinutesAfterStart;
+                  
+                  return canCancel ? (
+                    <button 
+                      onClick={() => cancelBet(bet.id, bet.amount)}
+                      style={{ background: '#ff4a4a' }}
+                    >
+                      Cancel
+                    </button>
+                  ) : null;
+                })()}
               </td>
             </tr>
           ))}

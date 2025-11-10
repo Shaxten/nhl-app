@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../supabase';
 import { clearCache } from '../utils/fetchWithFallback';
 
 function Admin() {
   const { t } = useLanguage();
+  const { profile } = useAuth();
   const [processing, setProcessing] = useState(false);
   const [results, setResults] = useState<string[]>([]);
 
@@ -202,6 +204,18 @@ function Admin() {
 
     setResults(logs);
     setProcessing(false);
+  }
+
+  // Check if user is authorized
+  if (!profile || (profile.display_name !== 'Po' && profile.display_name !== 'Nikita')) {
+    return (
+      <div className="container">
+        <h1>Access Denied</h1>
+        <p style={{ marginTop: '1rem', color: '#ff4a4a' }}>
+          You do not have permission to access this page.
+        </p>
+      </div>
+    );
   }
 
   return (

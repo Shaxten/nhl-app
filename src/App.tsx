@@ -50,11 +50,13 @@ function Navigation() {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <li>
-              <button onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ padding: '0.5rem 1rem', background: '#ccc', color: '#000' }}>
+              <button onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ padding: '0.5rem 1rem', background: 'transparent', color: '#a8d5ff', border: 'none', cursor: 'pointer' }}>
                 {language === 'en' ? 'FR' : 'EN'}
               </button>
             </li>
-            <li><Link to="/admin">{t.nav.admin}</Link></li>
+            {(profile?.display_name === 'Po' || profile?.display_name === 'Nikita') && (
+              <li><Link to="/admin">{t.nav.admin}</Link></li>
+            )}
             {user && <li><button onClick={signOut} style={{ padding: '0.5rem 1rem' }}>{t.nav.signOut}</button></li>}
           </div>
         </ul>
@@ -93,7 +95,9 @@ function Navigation() {
                   {language === 'en' ? 'FR' : 'EN'}
                 </button>
               </li>
-              <li className="nav-item"><Link className="nav-link" to="/admin">{t.nav.admin}</Link></li>
+              {(profile?.display_name === 'Po' || profile?.display_name === 'Nikita') && (
+                <li className="nav-item"><Link className="nav-link" to="/admin">{t.nav.admin}</Link></li>
+              )}
               {user ? (
                 <>
                   <li className="nav-item"><Link className="nav-link" to="/profile">{profile?.display_name}</Link></li>
