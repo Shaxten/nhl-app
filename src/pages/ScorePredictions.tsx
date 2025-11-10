@@ -94,7 +94,7 @@ function ScorePredictions() {
         </div>
       </div>
 
-      <table style={{ marginTop: '2rem' }}>
+      <table className="predictions-table" style={{ marginTop: '2rem' }}>
         <thead>
           <tr>
             <th>{t.scorePredictions.game}</th>

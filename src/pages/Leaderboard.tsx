@@ -68,7 +68,7 @@ function Leaderboard() {
         {language === 'fr' ? 'Actualiser' : 'Refresh'}
       </button>
       <table style={{ marginTop: '2rem' }}>
-        <thead>
+        <thead className="tableright">
           <tr style={{ textAlign: 'right' }}>
             <th>{t.leaderboard.rank}</th>
             <th>{t.leaderboard.player}</th>
@@ -77,7 +77,6 @@ function Leaderboard() {
             <th>{language === 'fr' ? 'Bets perdus' : 'Bets Lost'}</th>
             <th>{language === 'fr' ? 'Taux de victoire' : 'Win Rate'}</th>
             <th>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</th>
-            <th>{language === 'fr' ? 'Prédictions correctes' : 'Correct Predictions'}</th>
             <th>{language === 'fr' ? 'Précision' : 'Prediction Accuracy'}</th>
             <th>{language === 'fr' ? 'Gains totaux' : 'Total Winnings'}</th>
           </tr>
@@ -92,7 +91,6 @@ function Leaderboard() {
               <td>{leader.bets_lost || 0}</td>
               <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)} %</td>
               <td>{leader.score_predictions_total || 0}</td>
-              <td>{leader.score_predictions_correct || 0}</td>
               <td>
                 {(leader.score_predictions_total || 0) > 0 
                   ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)} %`

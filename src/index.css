@@ -13,8 +13,13 @@ body {
   line-height: 1.6;
 }
 
-.tableright tr td {
+.tableright tr td, .tableright tr th {
   text-align: right !important;
+}
+
+.predictions-table th:not(:nth-child(5)),
+.predictions-table td:not(:nth-child(5)) {
+  text-align: center !important;
 }
     #root {
   min-height: 100vh;
