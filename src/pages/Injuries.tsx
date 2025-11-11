@@ -151,7 +151,7 @@ function Injuries() {
               <tr style={{ borderBottom: '2px solid #333' }}>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Joueur' : 'Player'}</th>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Position' : 'Position'}</th>
-                <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Date de retour' : 'Return Date'}</th>
+                <th style={{ padding: '0.75rem', textAlign: 'left', minWidth: '150px' }}>{language === 'fr' ? 'Date de retour' : 'Return Date'}</th>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Statut' : 'Status'}</th>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Commentaire' : 'Comment'}</th>
               </tr>
