@@ -8,6 +8,7 @@ import PlayerStats from './pages/PlayerStats';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Betting from './pages/Betting';
+import BetParlay from './pages/BetParlay';
 import MyBets from './pages/MyBets';
 import ScorePredictions from './pages/ScorePredictions';
 import Leaderboard from './pages/Leaderboard';
@@ -47,6 +48,7 @@ function Navigation() {
              <span><Link to="/betting">{t.nav.betting} ▾</Link></span>
               <ul className="dropdown-menu">
                 {user && <li><Link to="/betting">{t.nav.gambling}</Link></li>}
+                {user && <li><Link to="/bet-parlay">Parlay</Link></li>}
                 {user && <li><Link to="/my-bets">{t.nav.myBets}</Link></li>}
                 {user && <li><Link to="/score-predictions">{t.nav.scorePredictions}</Link></li>}
                 <li><Link to="/leaderboard">{t.nav.leaderboard}</Link></li>
@@ -102,6 +104,7 @@ function Navigation() {
                 <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.betting}</a>
                 <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
                   <li><Link className="dropdown-item" to="/betting" style={{ color: '#fff' }}>{t.nav.betting}</Link></li>
+                  {user && <li><Link className="dropdown-item" to="/bet-parlay" style={{ color: '#fff' }}>Parlay</Link></li>}
                   {user && <li><Link className="dropdown-item" to="/my-bets" style={{ color: '#fff' }}>{t.nav.myBets}</Link></li>}
                   {user && <li><Link className="dropdown-item" to="/score-predictions" style={{ color: '#fff' }}>{t.nav.scorePredictions}</Link></li>}
                   <li><Link className="dropdown-item" to="/leaderboard" style={{ color: '#fff' }}>{t.nav.leaderboard}</Link></li>
@@ -146,6 +149,7 @@ function App() {
           <Route path="/teams" element={<TeamStats />} />
           <Route path="/players" element={<PlayerStats />} />
           <Route path="/betting" element={<Betting />} />
+          <Route path="/bet-parlay" element={<BetParlay />} />
           <Route path="/my-bets" element={<MyBets />} />
           <Route path="/score-predictions" element={<ScorePredictions />} />
           <Route path="/leaderboard" element={<Leaderboard />} />

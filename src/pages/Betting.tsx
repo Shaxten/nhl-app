@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getUpcomingGames, placeBet } from '../data';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase';
 
 interface Game {
@@ -180,6 +180,10 @@ function Betting() {
       {profile && (
         <div className="betting-currency" style={{ marginTop: '1rem' }}>
           {t.betting.availableCurrency}: <strong>{profile.currency} MC</strong>
+          <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+            {language === 'fr' ? 'Pour placer un parlay, allez ' : 'To place a parlay go '}
+            <Link to="/bet-parlay" style={{ color: '#a8d5ff', textDecoration: 'underline' }}>{language === 'fr' ? 'ici' : 'here'}</Link>.
+          </div>
         </div>
       )}
       <div style={{ marginTop: '2rem' }}>
