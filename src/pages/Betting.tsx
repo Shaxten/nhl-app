@@ -43,12 +43,11 @@ function Betting() {
   }, []);
 
   async function handleScorePrediction(gameId: number, homeTeam: string, awayTeam: string) {
-    if (!user) {
+    if (!user || !profile) {
       navigate('/auth');
       return;
     }
 
-    // Check if user already has a prediction for this game
     const { data: existing } = await supabase
       .from('score_predictions')
       .select('id')
@@ -63,13 +62,29 @@ function Betting() {
 
     const awayScore = parseInt((document.getElementById(`away-${gameId}`) as HTMLInputElement).value);
     const homeScore = parseInt((document.getElementById(`home-${gameId}`) as HTMLInputElement).value);
+    const parlayAmount = parseInt((document.getElementById(`parlay-amount-${gameId}`) as HTMLInputElement)?.value || '0');
 
     if (isNaN(awayScore) || isNaN(homeScore)) {
       alert(t.betting.enterValidScores);
       return;
     }
 
+    if (parlayAmount > 0 && parlayAmount > profile.currency) {
+      alert(t.betting.invalidAmount);
+      return;
+    }
+
     try {
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      const winner = homeScore > awayScore ? homeTeam : awayTeam;
+      const baseOdds = winner === homeTeam 
+        ? calculateOdds(game.homePoints || 0, game.awayPoints || 0)
+        : calculateOdds(game.awayPoints || 0, game.homePoints || 0);
+      
+      const parlayOdds = parlayAmount > 0 ? baseOdds * 5.0 : 1.0;
+
       await supabase.from('score_predictions').insert({
         user_id: user.id,
         game_id: gameId,
@@ -77,11 +92,25 @@ function Betting() {
         away_team: awayTeam,
         predicted_home_score: homeScore,
         predicted_away_score: awayScore,
+        parlay_amount: parlayAmount,
+        parlay_odds: parlayOdds,
         status: 'pending'
       });
+
+      if (parlayAmount > 0) {
+        await supabase
+          .from('profiles')
+          .update({ currency: profile.currency - parlayAmount })
+          .eq('id', user.id);
+        await refreshProfile();
+      }
+
       alert(t.betting.predictionSubmitted);
       (document.getElementById(`away-${gameId}`) as HTMLInputElement).value = '';
       (document.getElementById(`home-${gameId}`) as HTMLInputElement).value = '';
+      if (document.getElementById(`parlay-amount-${gameId}`)) {
+        (document.getElementById(`parlay-amount-${gameId}`) as HTMLInputElement).value = '';
+      }
     } catch (error) {
       alert(t.betting.failedPrediction);
     }
@@ -174,16 +203,15 @@ function Betting() {
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.awayRecord}</p>
                 <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
                 {!bettingClosed && (
-                  <div style={{ marginTop: '1rem' }}>
+                  <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                     <input
                       type="number"
                       placeholder={t.betting.betAmount}
                       value={awayBetAmount[game.id] || ''}
                       onChange={(e) => setAwayBetAmount({ ...awayBetAmount, [game.id]: Number(e.target.value) })}
-                      style={{ padding: '0.5rem', width: '100px', marginBottom: '0.5rem' }}
+                      style={{ padding: '0.5rem', width: '100px' }}
                       min="1"
                     />
-                    <br />
                     <button onClick={() => handleBet(game.id, 'away')}>
                       {language === 'fr' ? 'Miser' : 'Bet'}
                     </button>
@@ -202,16 +230,15 @@ function Betting() {
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
                 <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
                 {!bettingClosed && (
-                  <div style={{ marginTop: '1rem' }}>
+                  <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                     <input
                       type="number"
                       placeholder={t.betting.betAmount}
                       value={homeBetAmount[game.id] || ''}
                       onChange={(e) => setHomeBetAmount({ ...homeBetAmount, [game.id]: Number(e.target.value) })}
-                      style={{ padding: '0.5rem', width: '100px', marginBottom: '0.5rem' }}
+                      style={{ padding: '0.5rem', width: '100px' }}
                       min="1"
                     />
-                    <br />
                     <button onClick={() => handleBet(game.id, 'home')}>
                       {language === 'fr' ? 'Miser' : 'Bet'}
                     </button>
@@ -224,8 +251,9 @@ function Betting() {
             ) : (
               <>
                 <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
-                  <h4 style={{ marginBottom: '0.5rem' }}>{t.betting.predictScore}</h4>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <h4 style={{ marginBottom: '0.5rem' }}>{language === 'fr' ? 'Prédiction du score final' : 'Score Prediction'}</h4>
+                                  <p className="pSmall" style={{ color: '#fbbf24', marginBottom: '0.5rem' }}>{language === 'fr' ? 'Prédit gratuitement ou risque de gagner 5x ta mise si le score est exact!' : 'Predict for free or get 5x your stake if you guess the exact score!'}</p>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <input
                       type="number"
                       placeholder={game.awayTeam}
@@ -240,6 +268,13 @@ function Betting() {
                       min="0"
                       style={{ width: '60px', padding: '0.5rem' }}
                       id={`home-${game.id}`}
+                    />
+                    <input
+                      type="number"
+                      placeholder={language === 'fr' ? 'Montant (optionnel)' : 'Amount (optional)'}
+                      min="0"
+                      style={{ width: '140px', padding: '0.5rem' }}
+                      id={`parlay-amount-${game.id}`}
                     />
                     <button onClick={() => handleScorePrediction(game.id, game.homeTeam, game.awayTeam)}>
                       {t.betting.submitPrediction}

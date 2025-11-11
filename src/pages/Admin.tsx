@@ -58,7 +58,24 @@ function Admin() {
               if (updateError) {
                 logs.push(`  ERROR: Prediction ${pred.id} - ${updateError.message}`);
               } else {
-                logs.push(`  ✓ Prediction ${pred.id} (User ${pred.user_id}): ${correct ? 'CORRECT' : 'INCORRECT'}`);
+                if (correct && pred.parlay_amount && pred.parlay_amount > 0) {
+                  const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('currency')
+                    .eq('id', pred.user_id)
+                    .single();
+                  
+                  if (profile) {
+                    const winnings = Math.round(pred.parlay_amount * (pred.parlay_odds || 1.0));
+                    await supabase
+                      .from('profiles')
+                      .update({ currency: (profile.currency || 0) + winnings })
+                      .eq('id', pred.user_id);
+                    logs.push(`  ✓ Prediction ${pred.id} (User ${pred.user_id}): CORRECT - PARLAY WON ${pred.parlay_amount} @ ${pred.parlay_odds}x = ${winnings} MC`);
+                  }
+                } else {
+                  logs.push(`  ✓ Prediction ${pred.id} (User ${pred.user_id}): ${correct ? 'CORRECT' : 'INCORRECT'}`);
+                }
               }
             }
           } catch (error) {
