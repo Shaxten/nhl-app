@@ -26,15 +26,15 @@ export function getCurrentSeason() {
 
 export async function fetchSkaterStats() {
   const season = getCurrentSeason();
-  const response = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=points&limit=100`));
+  const response = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=points&limit=300`));
   return response.json();
 }
 
 export async function fetchSkaterStatsDetailed() {
   const season = getCurrentSeason();
-  const response = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=goals&limit=100`));
+  const response = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=goals&limit=300`));
   const goalsData = await response.json();
-  const assistsResponse = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=assists&limit=100`));
+  const assistsResponse = await fetch(getUrl(`/skater-stats-leaders/${season}/2?categories=assists&limit=300`));
   const assistsData = await assistsResponse.json();
   return { goals: goalsData, assists: assistsData };
 }
