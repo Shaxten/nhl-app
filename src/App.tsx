@@ -39,7 +39,7 @@ function Navigation() {
               </ul>
             </li>
             <li className="dropdown">
-              <span><Link to="/players">{t.nav.stats} ▾</Link></span>
+              <span><Link to="/divisions">{t.nav.stats} ▾</Link></span>
               <ul className="dropdown-menu">
                 <li><Link to="/divisions">{t.nav.divisions}</Link></li>
                 <li><Link to="/teams">{t.nav.teamStats}</Link></li>
@@ -50,14 +50,19 @@ function Navigation() {
              <span><Link to="/betting">{t.nav.betting} ▾</Link></span>
               <ul className="dropdown-menu">
                 {user && <li><Link to="/betting">{t.nav.gambling}</Link></li>}
-                {user && <li><Link to="/bet-parlay">Parlay</Link></li>}
-                {user && <li><Link to="/my-bets">{t.nav.myBets}</Link></li>}
-                {user && <li><Link to="/score-predictions">{t.nav.scorePredictions}</Link></li>}
+                {user && <li><Link to="/bet-parlay">{language === 'fr' ? 'Faites un parlay' : 'Do a Parlay'}</Link></li>}
                 <li><Link to="/leaderboard">{t.nav.leaderboard}</Link></li>
               </ul>
             </li>     
             {user ? (
-              <li><Link to="/profile">{profile?.display_name}</Link></li>
+              <li className="dropdown">
+                <span><Link to="/my-bets">{profile?.display_name} ▾</Link></span>
+                <ul className="dropdown-menu">
+                  <li><Link to="/my-bets">{t.nav.myBets}</Link></li>
+                  <li><Link to="/score-predictions">{t.nav.scorePredictions}</Link></li>
+                  <li><Link to="/profile">{t.profile.title}</Link></li>
+                </ul>
+              </li>
             ) : (
               <li><Link to="/auth">{t.nav.signIn}</Link></li>
             )}
@@ -111,9 +116,7 @@ function Navigation() {
                 <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.betting}</a>
                 <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
                   <li><Link className="dropdown-item" to="/betting" style={{ color: '#fff' }}>{t.nav.betting}</Link></li>
-                  {user && <li><Link className="dropdown-item" to="/bet-parlay" style={{ color: '#fff' }}>Parlay</Link></li>}
-                  {user && <li><Link className="dropdown-item" to="/my-bets" style={{ color: '#fff' }}>{t.nav.myBets}</Link></li>}
-                  {user && <li><Link className="dropdown-item" to="/score-predictions" style={{ color: '#fff' }}>{t.nav.scorePredictions}</Link></li>}
+                  {user && <li><Link className="dropdown-item" to="/bet-parlay" style={{ color: '#fff' }}>{language === 'fr' ? 'Faites un parlay' : 'Do a Parlay'}</Link></li>}
                   <li><Link className="dropdown-item" to="/leaderboard" style={{ color: '#fff' }}>{t.nav.leaderboard}</Link></li>
                 </ul>
               </li>
@@ -132,7 +135,14 @@ function Navigation() {
               )}
               {user ? (
                 <>
-                  <li className="nav-item"><Link className="nav-link" to="/profile">{profile?.display_name}</Link></li>
+                  <li className="nav-item dropdown">
+                    <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{profile?.display_name}</a>
+                    <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
+                      <li><Link className="dropdown-item" to="/my-bets" style={{ color: '#fff' }}>{t.nav.myBets}</Link></li>
+                      <li><Link className="dropdown-item" to="/score-predictions" style={{ color: '#fff' }}>{t.nav.scorePredictions}</Link></li>
+                      <li><Link className="dropdown-item" to="/profile" style={{ color: '#fff' }}>{t.profile.title}</Link></li>
+                    </ul>
+                  </li>
                   <li className="nav-item"><button className="btn btn-sm" onClick={signOut} style={{ background: '#a8d5ff', color: '#000', margin: '0.5rem' }}>{t.nav.signOut}</button></li>
                 </>
               ) : (

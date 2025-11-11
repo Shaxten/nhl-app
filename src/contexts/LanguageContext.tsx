@@ -143,7 +143,7 @@ const translations: Record<Language, Translations> = {
       news: 'News',
       latestNews: 'Latest news',
       stats: 'Stats',
-      betting: 'Gambling',
+      betting: 'Bets',
       gambling: 'Place your bets',
       divisions: 'Divisions',
       teamStats: 'Teams',

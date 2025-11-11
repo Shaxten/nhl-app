@@ -16,14 +16,28 @@ interface Bet {
   game_start_time?: string;
 }
 
+interface ParlayBet {
+  id: number;
+  selections: { game_id: number; team: string; odds: number }[];
+  bet_amount: number;
+  total_odds: number;
+  potential_win: number;
+  status: string;
+  created_at: string;
+}
+
 function MyBets() {
   const { user, refreshProfile } = useAuth();
   const { language, t } = useLanguage();
   const [bets, setBets] = useState<Bet[]>([]);
+  const [parlayBets, setParlayBets] = useState<ParlayBet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) loadBets();
+    if (user) {
+      loadBets();
+      loadParlayBets();
+    }
   }, [user]);
 
   async function loadBets() {
@@ -55,6 +69,24 @@ function MyBets() {
     setLoading(false);
   }
 
+  async function loadParlayBets() {
+    try {
+      const { data, error } = await supabase
+        .from('parlay_bets')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error loading parlay bets:', error);
+        return;
+      }
+      if (data) setParlayBets(data);
+    } catch (err) {
+      console.error('Failed to load parlay bets:', err);
+    }
+  }
+
   async function cancelBet(betId: number, amount: number) {
     if (!confirm('Cancel this bet and refund your currency?')) return;
 
@@ -75,12 +107,35 @@ function MyBets() {
     loadBets();
   }
 
+  async function cancelParlay(parlayId: number, amount: number) {
+    if (!confirm('Cancel this parlay and refund your currency?')) return;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('currency')
+      .eq('id', user?.id)
+      .single();
+
+    await supabase.from('parlay_bets').delete().eq('id', parlayId);
+    
+    await supabase
+      .from('profiles')
+      .update({ currency: (profile?.currency || 0) + amount })
+      .eq('id', user?.id);
+
+    await refreshProfile();
+    loadParlayBets();
+  }
+
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
       <h1>{t.myBets.title}</h1>
-      <table style={{ marginTop: '2rem' }}>
+      
+      <h2 style={{ marginTop: '2rem' }}>{language === 'fr' ? 'Bets simples' : 'Single Bets'}</h2>
+      <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '1rem' }}>
+      <table style={{ width: '100%' }}>
         <thead className="tableright">
           <tr>
             <th className="game-center">{t.myBets.game}</th>
@@ -90,7 +145,7 @@ function MyBets() {
             <th>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
             <th className="game-center">{t.myBets.status}</th>
             <th className="date-left">{language === 'fr' ? 'Date' : 'Date'}</th>
-            <th>{language === 'fr' ? 'Action' : 'Action'}</th>
+            <th className="action-column">{language === 'fr' ? 'Action' : 'Action'}</th>
           </tr>
         </thead>
         <tbody className="tableright">
@@ -111,7 +166,7 @@ function MyBets() {
                 </span>
               </td>
               <td className="date-left">{new Date(bet.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
-              <td>
+              <td className="action-column">
                 {bet.status === 'pending' && (() => {
                   const gameStartTime = bet.game_start_time ? new Date(bet.game_start_time) : null;
                   const now = new Date();
@@ -132,6 +187,62 @@ function MyBets() {
           ))}
         </tbody>
       </table>
+      </div>
+
+      {parlayBets.length > 0 && (
+        <>
+          <h2 style={{ marginTop: '2rem' }}>Parlays</h2>
+          <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '1rem' }}>
+            <table style={{ width: '100%' }}>
+              <thead className="tableright">
+                <tr>
+                  <th>{language === 'fr' ? 'Sélections' : 'Selections'}</th>
+                  <th>{t.myBets.amount}</th>
+                  <th>{language === 'fr' ? 'Cote totale' : 'Total Odds'}</th>
+                  <th>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
+                  <th className="game-center">{t.myBets.status}</th>
+                  <th className="date-left">{language === 'fr' ? 'Date' : 'Date'}</th>
+                  <th className="action-column">{language === 'fr' ? 'Action' : 'Action'}</th>
+                </tr>
+              </thead>
+              <tbody className="tableright">
+                {parlayBets.map(parlay => (
+                  <tr key={parlay.id}>
+                    <td>
+                      {parlay.selections.map((sel, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: idx < parlay.selections.length - 1 ? '0.25rem' : '0' }}>
+                          <img src={`https://assets.nhle.com/logos/nhl/svg/${sel.team}_light.svg`} alt={sel.team} style={{ width: '25px', height: '25px' }} />
+                          <span>{sel.team}</span>
+                          <span style={{ color: 'var(--accent-yellow)', fontSize: '0.9rem' }}>({sel.odds.toFixed(2)}x)</span>
+                        </div>
+                      ))}
+                    </td>
+                    <td>{parlay.bet_amount} MC</td>
+                    <td style={{ color: 'var(--accent-yellow)' }}>{parlay.total_odds.toFixed(2)}x</td>
+                    <td style={{ color: 'var(--text-primary)' }}>{parlay.potential_win.toFixed(2)} MC</td>
+                    <td className="game-center">
+                      <span style={{ color: parlay.status === 'won' ? '#4ade80' : parlay.status === 'lost' ? '#ff4a4a' : '#aaa' }}>
+                        {parlay.status === 'pending' ? t.myBets.pending : parlay.status === 'won' ? t.myBets.won : t.myBets.lost}
+                      </span>
+                    </td>
+                    <td className="date-left">{new Date(parlay.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+                    <td className="action-column">
+                      {parlay.status === 'pending' && (
+                        <button 
+                          onClick={() => cancelParlay(parlay.id, parlay.bet_amount)}
+                          style={{ background: '#ff4a4a' }}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

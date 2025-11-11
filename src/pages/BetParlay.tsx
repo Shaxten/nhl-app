@@ -99,7 +99,7 @@ function BetParlay() {
     }
 
     try {
-      await supabase.from('parlay_bets').insert({
+      const { data, error } = await supabase.from('parlay_bets').insert({
         user_id: user.id,
         selections: selections.map(s => ({ game_id: s.gameId, team: s.team, odds: s.odds })),
         bet_amount: betAmount,
@@ -107,6 +107,12 @@ function BetParlay() {
         potential_win: getPotentialWin(),
         status: 'pending'
       });
+
+      if (error) {
+        console.error('Parlay insert error:', error);
+        alert(t.betting.failedBet + ': ' + error.message);
+        return;
+      }
 
       await supabase
         .from('profiles')
@@ -117,8 +123,9 @@ function BetParlay() {
       alert(t.betting.betPlaced);
       setSelections([]);
       setBetAmount(0);
-    } catch {
-      alert(t.betting.failedBet);
+    } catch (err: any) {
+      console.error('Parlay error:', err);
+      alert(t.betting.failedBet + ': ' + err.message);
     }
   }
 
@@ -126,7 +133,7 @@ function BetParlay() {
 
   return (
     <div className="container">
-      <h1>Parlay</h1>
+      <h1>{language === 'fr' ? 'Faites un parlay' : 'Do a Parlay'}</h1>
       {profile && (
         <div style={{ marginTop: '1rem' }}>
           {t.betting.availableCurrency}: <strong>{profile.currency} MC</strong>
@@ -150,6 +157,7 @@ function BetParlay() {
                   <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: awaySelected ? 'var(--selected-bg)' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'away')}>
                     <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '60px', height: '60px' }} />
                     <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeamName || game.awayTeam}</p>
+                    <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '0.25rem' }}>{game.awayRecord}</p>
                     <p style={{ color: 'var(--accent-yellow)' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
                   </div>
                   <div style={{ textAlign: 'center', padding: '0 1rem' }}>
@@ -161,6 +169,7 @@ function BetParlay() {
                   <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: homeSelected ? 'var(--selected-bg)' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'home')}>
                     <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '60px', height: '60px' }} />
                     <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeamName || game.homeTeam}</p>
+                    <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '0.25rem' }}>{game.homeRecord}</p>
                     <p style={{ color: 'var(--accent-yellow)' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
                   </div>
                 </div>

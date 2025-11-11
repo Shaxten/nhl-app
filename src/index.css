@@ -82,6 +82,11 @@ body {
   text-align: center !important;
 }
 
+.tableright tr td.action-column, .tableright tr th.action-column {
+  width: 100px;
+  text-align: center !important;
+}
+
 .predictions-table th:not(:nth-child(5)),
 .predictions-table td:not(:nth-child(5)) {
   text-align: center !important;
