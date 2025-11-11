@@ -1,4 +1,5 @@
-const BASE_URL = 'https://api.allorigins.win/raw?url=https://api-web.nhle.com/v1';
+const isDev = import.meta.env.DEV;
+const BASE_URL = isDev ? '/api/nhl' : 'https://api-web.nhle.com/v1';
 
 export async function fetchStandings() {
   const response = await fetch(`${BASE_URL}/standings/now`);
@@ -24,15 +25,15 @@ export function getCurrentSeason() {
 
 export async function fetchSkaterStats() {
   const season = getCurrentSeason();
-  const response = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=points&limit=50`);
+  const response = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=points&limit=100`);
   return response.json();
 }
 
 export async function fetchSkaterStatsDetailed() {
   const season = getCurrentSeason();
-  const response = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=goals&limit=50`);
+  const response = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=goals&limit=100`);
   const goalsData = await response.json();
-  const assistsResponse = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=assists&limit=50`);
+  const assistsResponse = await fetch(`${BASE_URL}/skater-stats-leaders/${season}/2?categories=assists&limit=100`);
   const assistsData = await assistsResponse.json();
   return { goals: goalsData, assists: assistsData };
 }

@@ -15,6 +15,11 @@ export default defineConfig({
         target: 'https://www.espn.com',
         changeOrigin: true,
         rewrite: (path) => '/nhl/injuries'
+      },
+      '/api/nhl': {
+        target: 'https://api-web.nhle.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/nhl/, '/v1')
       }
     }
   }
