@@ -82,7 +82,7 @@ function Injuries() {
   async function fetchInjuries() {
     try {
       const isDev = import.meta.env.DEV;
-      const url = isDev ? '/api/injuries' : 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.espn.com/nhl/injuries');
+      const url = isDev ? '/api/injuries' : 'https://corsproxy.io/?' + encodeURIComponent('https://www.espn.com/nhl/injuries');
       const response = await fetch(url);
       const html = await response.text();
       

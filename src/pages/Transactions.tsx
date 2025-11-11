@@ -77,7 +77,7 @@ function Transactions() {
   async function fetchTransactions() {
     try {
       const isDev = import.meta.env.DEV;
-      const url = isDev ? '/api/transactions' : 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.espn.com/nhl/transactions');
+      const url = isDev ? '/api/transactions' : 'https://corsproxy.io/?' + encodeURIComponent('https://www.espn.com/nhl/transactions');
       const response = await fetch(url);
       const html = await response.text();
       
