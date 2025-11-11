@@ -30,7 +30,7 @@ function Navigation() {
             <li className="dropdown">
               <span><Link to="/news">{t.nav.news} ▾</Link></span>
               <ul className="dropdown-menu">
-                <li><Link to="/news">{language === 'fr' ? 'Nouvelles' : 'News'}</Link></li>
+                <li><Link to="/news">{t.nav.latestNews}</Link></li>
                 <li><Link to="/transactions">{language === 'fr' ? 'Transactions' : 'Transactions'}</Link></li>
                 <li><Link to="/injuries">{language === 'fr' ? 'Blessures' : 'Injuries'}</Link></li>
               </ul>
@@ -85,7 +85,7 @@ function Navigation() {
               <li className="nav-item dropdown">
                 <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.news}</a>
                 <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
-                  <li><Link className="dropdown-item" to="/news" style={{ color: '#fff' }}>{language === 'fr' ? 'Nouvelles' : 'News'}</Link></li>
+                  <li><Link className="dropdown-item" to="/news" style={{ color: '#fff' }}>{t.nav.latestNews}</Link></li>
                   <li><Link className="dropdown-item" to="/transactions" style={{ color: '#fff' }}>{language === 'fr' ? 'Transactions' : 'Transactions'}</Link></li>
                   <li><Link className="dropdown-item" to="/injuries" style={{ color: '#fff' }}>{language === 'fr' ? 'Blessures' : 'Injuries'}</Link></li>
                 </ul>

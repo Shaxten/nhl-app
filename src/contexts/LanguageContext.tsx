@@ -6,6 +6,7 @@ interface Translations {
   nav: {
     home: string;
     news: string;
+    latestNews: string;
     stats: string;
     betting: string;
     gambling: string;
@@ -140,12 +141,13 @@ const translations: Record<Language, Translations> = {
     nav: {
       home: 'Home',
       news: 'News',
+      latestNews: 'Latest news',
       stats: 'Stats',
       betting: 'Gambling',
       gambling: 'Place your bets',
       divisions: 'Divisions',
-      teamStats: 'Team',
-      playerStats: 'Player',
+      teamStats: 'Teams',
+      playerStats: 'Players',
       myBets: 'My Bets',
       scorePredictions: 'Predictions',
       leaderboard: 'Leaderboard',
@@ -272,6 +274,7 @@ const translations: Record<Language, Translations> = {
     nav: {
       home: 'Accueil',
       news: 'Nouvelles',
+      latestNews: 'À la une',
       stats: 'Statistiques',
       betting: 'Bets',
       gambling: 'Placez vos bets',
