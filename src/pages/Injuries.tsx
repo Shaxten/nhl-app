@@ -164,15 +164,15 @@ function Injuries() {
       
       {teamInjuries.map((teamData, teamIndex) => (
         <div key={teamIndex} style={{ marginBottom: '2rem' }}>
-          <h3 style={{ background: '#2a2a2a', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h3 style={{ background: 'var(--bg-secondary)', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>{teamData.teamName}</span>
             {teamLogos[teamData.teamAbbrev] && (
               <img src={teamLogos[teamData.teamAbbrev]} alt={teamData.teamAbbrev} style={{ width: '40px', height: '40px' }} />
             )}
           </h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', background: '#1a1a1a' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--bg-primary)' }}>
             <thead>
-              <tr style={{ borderBottom: '2px solid #333' }}>
+              <tr style={{ borderBottom: '2px solid var(--border)' }}>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Joueur' : 'Player'}</th>
                 <th style={{ padding: '0.75rem', textAlign: 'left' }}>{language === 'fr' ? 'Position' : 'Position'}</th>
                 <th style={{ padding: '0.75rem', textAlign: 'left', minWidth: '150px' }}>{language === 'fr' ? 'Date de retour' : 'Return Date'}</th>
@@ -182,7 +182,7 @@ function Injuries() {
             </thead>
             <tbody>
               {teamData.injuries.map((injury, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid #333' }}>
+                <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '0.75rem' }}>{injury.player}</td>
                   <td style={{ padding: '0.75rem' }}>{injury.position}</td>
                   <td style={{ padding: '0.75rem' }}>{injury.returnDate}</td>

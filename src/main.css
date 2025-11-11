@@ -15,14 +15,14 @@
 }
 
 .division-card {
-    background: #2a2a2a;
+    background: var(--bg-secondary);
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .team-stats {
-    background: #2a2a2a;
+    background: var(--bg-secondary);
     padding: 2rem;
     border-radius: 8px;
     margin-top: 2rem;
@@ -36,7 +36,7 @@
 }
 
 .stat-box {
-    background: #333;
+    background: var(--bg-tertiary);
     padding: 1rem;
     border-radius: 4px;
     text-align: center;
@@ -45,11 +45,11 @@
     .stat-box h3 {
         font-size: 2rem;
         margin-bottom: 0.25rem;
-        color: white;
+        color: var(--text-primary);
     }
 
     .stat-box p {
-        color: #aaa;
+        color: var(--text-secondary);
         font-size: 0.9rem;
     }
 
@@ -58,7 +58,7 @@
 }
 
 .prediction th{
-    color:white;
+    color: var(--text-primary);
 }
 
 @media (max-width: 768px) {

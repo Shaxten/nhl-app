@@ -182,7 +182,7 @@ function Betting() {
           {t.betting.availableCurrency}: <strong>{profile.currency} MC</strong>
           <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
             {language === 'fr' ? 'Pour placer un parlay, allez ' : 'To place a parlay go '}
-            <Link to="/bet-parlay" style={{ color: '#a8d5ff', textDecoration: 'underline' }}>{language === 'fr' ? 'ici' : 'here'}</Link>.
+            <Link to="/bet-parlay" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>{language === 'fr' ? 'ici' : 'here'}</Link>.
           </div>
         </div>
       )}
@@ -205,7 +205,7 @@ function Betting() {
                 <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '80px', height: '80px' }} />
                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.3rem' }}>{game.awayTeamName || game.awayTeam}</p>
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.awayRecord}</p>
-                <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
+                <p style={{ color: 'var(--accent-yellow)', marginTop: '0.25rem' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
                 {!bettingClosed && (
                   <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                     <input
@@ -232,7 +232,7 @@ function Betting() {
                 <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
                 <p style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.3rem' }}>{game.homeTeamName || game.homeTeam}</p>
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
-                <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
+                <p style={{ color: 'var(--accent-yellow)', marginTop: '0.25rem' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
                 {!bettingClosed && (
                   <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                     <input
@@ -254,9 +254,9 @@ function Betting() {
               <p style={{ color: '#ff4a4a', marginTop: '1rem', textAlign: 'center' }}>{t.betting.bettingClosed}</p>
             ) : (
               <>
-                <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
+                <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>
                   <h4 style={{ marginBottom: '0.5rem' }}>{language === 'fr' ? 'Prédiction du score final' : 'Score Prediction'}</h4>
-                                  <p className="pSmall" style={{ color: '#fbbf24', marginBottom: '0.5rem' }}>{language === 'fr' ? 'Prédit gratuitement ou risque de gagner 5x ta mise si le score est exact!' : 'Predict for free or get 5x your stake if you guess the exact score!'}</p>
+                                  <p className="pSmall" style={{ color: 'var(--accent-yellow)', marginBottom: '0.5rem' }}>{language === 'fr' ? 'Prédit gratuitement ou risque de gagner 5x ta mise si le score est exact!' : 'Predict for free or get 5x your stake if you guess the exact score!'}</p>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <input
                       type="number"

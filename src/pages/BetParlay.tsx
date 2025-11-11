@@ -147,10 +147,10 @@ function BetParlay() {
             return (
               <div key={game.id} className="division-card" style={{ marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-                  <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: awaySelected ? '#2a4a2a' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'away')}>
+                  <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: awaySelected ? 'var(--selected-bg)' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'away')}>
                     <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '60px', height: '60px' }} />
                     <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeamName || game.awayTeam}</p>
-                    <p style={{ color: '#fbbf24' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
+                    <p style={{ color: 'var(--accent-yellow)' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
                   </div>
                   <div style={{ textAlign: 'center', padding: '0 1rem' }}>
                     <div style={{ fontWeight: 'bold' }}>@</div>
@@ -158,10 +158,10 @@ function BetParlay() {
                       {new Date(game.startTime).toLocaleTimeString(language === 'fr' ? 'fr-FR' : 'en-US', { hour: 'numeric', minute: '2-digit' })}
                     </p>
                   </div>
-                  <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: homeSelected ? '#2a4a2a' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'home')}>
+                  <div style={{ textAlign: 'center', flex: 1, cursor: bettingClosed ? 'not-allowed' : 'pointer', opacity: bettingClosed ? 0.5 : 1, background: homeSelected ? 'var(--selected-bg)' : 'transparent', padding: '1rem', borderRadius: '4px' }} onClick={() => !bettingClosed && toggleSelection(game, 'home')}>
                     <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '60px', height: '60px' }} />
                     <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeamName || game.homeTeam}</p>
-                    <p style={{ color: '#fbbf24' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
+                    <p style={{ color: 'var(--accent-yellow)' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
                   </div>
                 </div>
               </div>
@@ -177,15 +177,15 @@ function BetParlay() {
             ) : (
               <>
                 {selections.map(sel => (
-                  <div key={sel.gameId} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid #333' }}>
+                  <div key={sel.gameId} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid var(--border)' }}>
                     <span>{sel.team}</span>
                     <span>{sel.odds.toFixed(2)}x</span>
                   </div>
                 ))}
-                <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
+                <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <strong>{language === 'fr' ? 'Cote totale :' : 'Total Odds:'}</strong>
-                    <strong style={{ color: '#fbbf24' }}>{getTotalOdds().toFixed(2)}x</strong>
+                    <strong style={{ color: 'var(--accent-yellow)' }}>{getTotalOdds().toFixed(2)}x</strong>
                   </div>
                   <input
                     type="number"

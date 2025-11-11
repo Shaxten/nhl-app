@@ -3,9 +3,10 @@
 nav {
     padding: 1rem;
     text-align: -webkit-center;
-    background: #1a1a1a;
+    background: var(--bg-primary);
     border-style: solid;
     border-width: 0px 0px 1px 0px;
+    border-color: var(--border);
     padding: 1rem;
     margin: 0 10rem;
     box-shadow: none;
@@ -20,14 +21,14 @@ nav ul {
 }
 
 nav a {
-    color: #fff;
+    color: var(--text-primary);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 nav a:hover, nav a.active {
-    color: #4a9eff;
+    color: var(--accent);
 }
 
 nav ul li {
@@ -45,14 +46,14 @@ nav ul li a:hover {
 }
 
     .dropdown span {
-        color: #fff;
+        color: var(--text-primary);
         font-weight: 500;
         padding: 0.5rem 0;
         display: block;
     }
 
     .dropdown:hover span {
-        color: #4a9eff;
+        color: var(--accent);
     }
 
 .dropdown-menu {
@@ -60,11 +61,11 @@ nav ul li a:hover {
     position: absolute;
     top: calc(100% + 0rem);
     left: 0;
-    background: #333;
+    background: var(--bg-tertiary);
     min-width: 180px;
     border-radius: 4px;
     padding: 0.5rem 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     z-index: 1000;
     list-style: none;
 }
@@ -79,19 +80,19 @@ nav ul li a:hover {
 }
 
     .dropdown-menu li:hover {
-        background: #2a2a2a;
+        background: var(--hover-bg);
     }
 
 .dropdown-menu a {
     display: block;
     width: 100%;
     padding: 0.75rem 1rem;
-    color: #fff;
+    color: var(--text-primary);
     text-decoration: none;
 }
 
     .dropdown-menu a:hover {
-        color: #4a9eff;
+        color: var(--accent);
     }
 
 

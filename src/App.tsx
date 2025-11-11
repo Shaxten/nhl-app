@@ -1,6 +1,7 @@
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import Home from './pages/Home';
 import Divisions from './pages/Divisions';
 import TeamStats from './pages/TeamStats';
@@ -20,6 +21,7 @@ import Injuries from './pages/Injuries';
 function Navigation() {
   const { user, profile, signOut } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -62,7 +64,12 @@ function Navigation() {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <li>
-              <button onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ padding: '0.5rem 1rem', background: 'transparent', color: '#a8d5ff', border: 'none', cursor: 'pointer' }}>
+              <button onClick={toggleTheme} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: 'none', cursor: 'pointer' }}>
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: 'none', cursor: 'pointer' }}>
                 {language === 'en' ? 'FR' : 'EN'}
               </button>
             </li>
@@ -111,7 +118,12 @@ function Navigation() {
                 </ul>
               </li>
               <li className="nav-item">
-                <button className="btn btn-sm" onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ background: '#ccc', color: '#000', margin: '0.5rem' }}>
+                <button className="btn btn-sm" onClick={toggleTheme} style={{ background: 'var(--accent)', color: 'var(--bg-primary)', margin: '0.5rem' }}>
+                  {theme === 'dark' ? '☀️' : '🌙'}
+                </button>
+              </li>
+              <li className="nav-item">
+                <button className="btn btn-sm" onClick={() => setLanguage(language === 'en' ? 'fr' : 'en')} style={{ background: 'var(--accent)', color: 'var(--bg-primary)', margin: '0.5rem' }}>
                   {language === 'en' ? 'FR' : 'EN'}
                 </button>
               </li>
@@ -136,9 +148,10 @@ function Navigation() {
 
 function App() {
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <LanguageProvider>
+          <Router>
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -157,9 +170,10 @@ function App() {
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
-        </Router>
-      </LanguageProvider>
-    </AuthProvider>
+          </Router>
+        </LanguageProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

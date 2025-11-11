@@ -4,13 +4,42 @@
   box-sizing: border-box;
 }
 
+:root[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #333;
+  --text-primary: #fff;
+  --text-secondary: #aaa;
+  --accent: #a8d5ff;
+  --accent-gold: #c3b27f;
+  --accent-yellow: #fbbf24;
+  --border: #444;
+  --hover-bg: #333;
+  --selected-bg: #1e4d2b;
+}
+
+:root[data-theme="light"] {
+  --bg-primary: #f5f5f5;
+  --bg-secondary: #fff;
+  --bg-tertiary: #e8e8e8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --accent: #2563eb;
+  --accent-gold: #c3b27f;
+  --accent-yellow: #d97706;
+  --border: #ddd;
+  --hover-bg: #f0f0f0;
+  --selected-bg: #bbf7d0;
+}
+
 /* Global CSS */
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background: #1a1a1a;
-  color: #fff;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
 }
 
 .tableright tr td, .tableright tr th {
@@ -49,7 +78,7 @@ body {
 /* Fonts & Colors CSS */
 
 h1, h2, h3 {
-    color: #a8d5ff;
+    color: var(--accent);
 }
 
 h1 {
@@ -73,11 +102,11 @@ p {
 }
 
 th {
-    color: #c3b27f
+    color: var(--accent-gold);
 }
 
 h3 a, .division-card a, ul li a:hover, li span:hover, li span:focus {
-    color: #a8d5ff !important;
+    color: var(--accent) !important;
 }
 
 .news-description {
@@ -114,7 +143,7 @@ h3 a, .division-card a, ul li a:hover, li span:hover, li span:focus {
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #2a2a2a;
+  background: var(--bg-secondary);
   border-radius: 8px;
   overflow: hidden;
   margin-top: 1rem;
@@ -136,13 +165,13 @@ th, td {
 }
 
 th {
-  background: #333;
+  background: var(--bg-tertiary);
   font-weight: 600;
-  color: #4a9eff;
+  color: var(--accent);
 }
 
 tr:hover {
-  background: #333;
+  background: var(--hover-bg);
 }
 
 /* -------------- */
@@ -155,8 +184,8 @@ select {
 }
 
 button:hover {
-    background: #c3b27f;
-    color: black;
+    background: var(--accent-gold);
+    color: var(--bg-primary);
 }
 
 a {
@@ -165,8 +194,8 @@ a {
 }
 
 button, select {
-    background: #a8d5ff;
-    color: black;
+    background: var(--accent);
+    color: var(--bg-primary);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
@@ -188,9 +217,9 @@ button {
 button:hover {
     background: transparent;
     padding: 0.7rem;
-    border-color: #a8d5ff;
+    border-color: var(--accent);
     border-style: solid;
-    color: #a8d5ff;
+    color: var(--accent);
 }
 
 .buttons {
@@ -204,34 +233,34 @@ button:hover {
 }
 
 .bouton1 {
-    background-color: #a8d5ff;
+    background-color: var(--accent);
     padding: 0.7rem;
     margin-right: 1rem;
-    color: black;
-    border-color: #a8d5ff;
+    color: var(--bg-primary);
+    border-color: var(--accent);
     border-style: solid;
 }
 
 .bouton2 {
-    border-color: #a8d5ff;
+    border-color: var(--accent);
     border-style: solid;
     padding: 0.7rem;
-    color: #a8d5ff;
+    color: var(--accent);
 }
 
 
     .bouton2:hover {
-        background-color: #a8d5ff;
+        background-color: var(--accent);
         padding: 0.7rem;
         margin-right: 1rem;
-        color: black;
+        color: var(--bg-primary);
     }
 
 .bouton1:hover {
-    border-color: #a8d5ff;
+    border-color: var(--accent);
     border-style: solid;
     padding: 0.7rem;
-    color: #a8d5ff;
+    color: var(--accent);
     background-color: transparent;
 }
 
@@ -276,16 +305,16 @@ button:hover {
     }
 
     .filters button.active {
-        background: #a8d5ff;
+        background: var(--accent);
     }
 
 input[type="number"],
 input[type="text"],
 input[type="email"],
 input[type="password"] {
-  background: #333;
-  color: #fff;
-  border: 1px solid #444;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   padding: 0.5rem;
   border-radius: 4px;
   font-size: 1rem;

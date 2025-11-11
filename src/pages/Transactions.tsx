@@ -139,11 +139,11 @@ function Transactions() {
       
       {transactionsByDay.map((day, dayIndex) => (
         <div key={dayIndex} style={{ marginBottom: '2rem' }}>
-          <h3 style={{ background: '#2a2a2a', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0 }}>{day.date}</h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', background: '#1a1a1a' }}>
+          <h3 style={{ background: 'var(--bg-secondary)', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0 }}>{day.date}</h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--bg-primary)' }}>
             <tbody>
               {day.transactions.map((transaction, idx) => (
-                <tr key={idx} style={{ borderBottom: '1px solid #333' }}>
+                <tr key={idx} style={{ borderBottom: '1px solid var(--border)' }}>
                   <td style={{ padding: '0.75rem', textAlign: 'center' }}>
                     {teamLogos[transaction.team] && (
                       <img src={teamLogos[transaction.team]} alt={transaction.team} style={{ width: '50px', height: '50px' }} />

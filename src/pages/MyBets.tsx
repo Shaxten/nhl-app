@@ -101,8 +101,8 @@ function MyBets() {
                 <img src={`https://assets.nhle.com/logos/nhl/svg/${bet.team_choice}_light.svg`} alt={bet.team_choice} style={{ width: '40px', height: '40px' }} />
               </td>
               <td>{bet.amount} MC</td>
-              <td style={{ color: '#fbbf24' }}>{bet.odds ? bet.odds.toFixed(2) : '2.00'}x</td>
-              <td style={{ color: '#fff' }}>{Math.round(bet.amount * (bet.odds || 2.0))} MC</td>
+              <td style={{ color: 'var(--accent-yellow)' }}>{bet.odds ? bet.odds.toFixed(2) : '2.00'}x</td>
+              <td style={{ color: 'var(--text-primary)' }}>{Math.round(bet.amount * (bet.odds || 2.0))} MC</td>
               <td className="game-center">
                 <span style={{ 
                           color: bet.status === 'won' ? '#4ade80' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
