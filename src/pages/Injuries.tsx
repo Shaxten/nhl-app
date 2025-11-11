@@ -15,41 +15,6 @@ interface TeamInjuries {
   injuries: Injury[];
 }
 
-const teamLogos: { [key: string]: string } = {
-  'ANA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ana.png&h=80&w=80',
-  'BOS': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/bos.png&h=80&w=80',
-  'BUF': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/buf.png&h=80&w=80',
-  'CAR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/car.png&h=80&w=80',
-  'CBJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cbj.png&h=80&w=80',
-  'CGY': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cgy.png&h=80&w=80',
-  'CHI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/chi.png&h=80&w=80',
-  'COL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/col.png&h=80&w=80',
-  'DAL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/dal.png&h=80&w=80',
-  'DET': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/det.png&h=80&w=80',
-  'EDM': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/edm.png&h=80&w=80',
-  'FLA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/fla.png&h=80&w=80',
-  'LA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png&h=80&w=80',
-  'MIN': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/min.png&h=80&w=80',
-  'MTL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png&h=80&w=80',
-  'NJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nj.png&h=80&w=80',
-  'NSH': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nsh.png&h=80&w=80',
-  'NYI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyi.png&h=80&w=80',
-  'NYR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyr.png&h=80&w=80',
-  'OTT': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ott.png&h=80&w=80',
-  'PHI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/phi.png&h=80&w=80',
-  'PIT': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/pit.png&h=80&w=80',
-  'SEA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sea.png&h=80&w=80',
-  'SJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sj.png&h=80&w=80',
-  'STL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/stl.png&h=80&w=80',
-  'TB': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tb.png&h=80&w=80',
-  'TOR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tor.png&h=80&w=80',
-  'UTA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/uta.png&h=80&w=80',
-  'VAN': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/van.png&h=80&w=80',
-  'VGK': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/vgk.png&h=80&w=80',
-  'WPG': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wpg.png&h=80&w=80',
-  'WSH': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wsh.png&h=80&w=80'
-};
-
 function Injuries() {
   const { language } = useLanguage();
   const [teamInjuries, setTeamInjuries] = useState<TeamInjuries[]>([]);
