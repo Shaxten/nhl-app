@@ -33,17 +33,17 @@
 }
 
 :root[data-theme="habs"] {
-  --bg-primary: #192168;
-  --bg-secondary: #213080;
-  --bg-tertiary: #2a3d98;
-  --text-primary: #e8e8e8;
-  --text-secondary: #b0b0b0;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #192168;
+  --text-secondary: #495057;
   --accent: #af1e2d;
   --accent-gold: #c3b27f;
   --accent-yellow: #d4a017;
-  --border: #3a4aa8;
-  --hover-bg: #2a3d98;
-  --selected-bg: #8b1a26;
+  --border: #dee2e6;
+  --hover-bg: #f1f3f5;
+  --selected-bg: #ffc9d0;
 }
 
 :root[data-theme="kings"] {
@@ -115,16 +115,9 @@ h1, h2, h3 {
 }
 
 [data-theme="habs"] h1,
-[data-theme="habs"] h2 {
-    text-shadow: 0.5px 0.5px 0.5px #fff, -0.5px -0.5px 0.5px #fff, 0.5px -0.5px 0.5px #fff, -0.5px 0.5px 0.5px #fff, 0 0 8px rgba(255, 255, 255, 0.5);
-}
-
+[data-theme="habs"] h2,
 [data-theme="habs"] h3 {
     text-shadow: none !important;
-}
-
-[data-theme="habs"] button {
-    color: #fff !important;
 }
 
 h1 {
