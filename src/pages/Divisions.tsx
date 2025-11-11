@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTeams } from '../data';
 import { Team } from '../types';
+import { getCachedData, setCachedData, clearCache } from '../utils/cache';
 
 function Divisions() {
   const { t, language } = useLanguage();
@@ -26,17 +27,29 @@ function Divisions() {
   };
 
   useEffect(() => {
-    getTeams().then(data => {
-      setTeams(data);
+    const cached = getCachedData<Team[]>('divisions');
+    if (cached) {
+      setTeams(cached);
       setLoading(false);
-    });
+    } else {
+      getTeams().then(data => {
+        setTeams(data);
+        setCachedData('divisions', data);
+        setLoading(false);
+      });
+    }
   }, []);
 
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
     <div className="container">
-      <h1>{t.divisions.title}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1>{t.divisions.title}</h1>
+        <button onClick={() => { clearCache('divisions'); setLoading(true); getTeams().then(data => { setTeams(data); setCachedData('divisions', data); setLoading(false); }); }} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+          {language === 'fr' ? 'Actualiser' : 'Refresh'}
+        </button>
+      </div>
       <div className="divisions-grid">
         {divisions.map(division => {
           const divisionTeams = teams

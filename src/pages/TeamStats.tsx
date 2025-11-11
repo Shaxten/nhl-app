@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTeams, getTeamPlayers } from '../data';
 import { Team, Player } from '../types';
+import { getCachedData, setCachedData, clearCache } from '../utils/cache';
 
 function TeamStats() {
   const { t, language } = useLanguage();
@@ -11,19 +12,38 @@ function TeamStats() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTeams().then(data => {
-      setTeams(data);
-      if (data.length > 0) {
-        const montrealTeam = data.find(team => team.abbrev === 'MTL');
-        setSelectedTeamAbbrev(montrealTeam ? montrealTeam.abbrev : data[0].abbrev);
+    const cached = getCachedData<Team[]>('teams');
+    if (cached) {
+      setTeams(cached);
+      if (cached.length > 0) {
+        const montrealTeam = cached.find(team => team.abbrev === 'MTL');
+        setSelectedTeamAbbrev(montrealTeam ? montrealTeam.abbrev : cached[0].abbrev);
       }
       setLoading(false);
-    });
+    } else {
+      getTeams().then(data => {
+        setTeams(data);
+        setCachedData('teams', data);
+        if (data.length > 0) {
+          const montrealTeam = data.find(team => team.abbrev === 'MTL');
+          setSelectedTeamAbbrev(montrealTeam ? montrealTeam.abbrev : data[0].abbrev);
+        }
+        setLoading(false);
+      });
+    }
   }, []);
 
   useEffect(() => {
     if (selectedTeamAbbrev) {
-      getTeamPlayers(selectedTeamAbbrev).then(setTeamPlayers);
+      const cached = getCachedData<Player[]>(`team_${selectedTeamAbbrev}`);
+      if (cached) {
+        setTeamPlayers(cached);
+      } else {
+        getTeamPlayers(selectedTeamAbbrev).then(data => {
+          setTeamPlayers(data);
+          setCachedData(`team_${selectedTeamAbbrev}`, data);
+        });
+      }
     }
   }, [selectedTeamAbbrev]);
 
@@ -31,9 +51,31 @@ function TeamStats() {
 
   const selectedTeam = teams.find(t => t.abbrev === selectedTeamAbbrev);
 
+  const refreshData = () => {
+    clearCache('teams');
+    clearCache(`team_${selectedTeamAbbrev}`);
+    setLoading(true);
+    getTeams().then(data => {
+      setTeams(data);
+      setCachedData('teams', data);
+      setLoading(false);
+    });
+    if (selectedTeamAbbrev) {
+      getTeamPlayers(selectedTeamAbbrev).then(data => {
+        setTeamPlayers(data);
+        setCachedData(`team_${selectedTeamAbbrev}`, data);
+      });
+    }
+  };
+
   return (
     <div className="container">
-      <h1>{t.teamStats.title}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1>{t.teamStats.title}</h1>
+        <button onClick={refreshData} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+          {language === 'fr' ? 'Actualiser' : 'Refresh'}
+        </button>
+      </div>
       <select value={selectedTeamAbbrev} onChange={(e) => setSelectedTeamAbbrev(e.target.value)}>
         {teams.sort((a, b) => a.name.localeCompare(b.name)).map(team => (
           <option key={team.abbrev} value={team.abbrev}>

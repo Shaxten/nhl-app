@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTopPlayers, getTopGoalies } from '../data';
 import { Player } from '../types';
+import { getCachedData, setCachedData, clearCache } from '../utils/cache';
 
 type FilterType = 'points' | 'goals' | 'assists' | 'goalies';
 
@@ -13,17 +14,27 @@ function PlayerStats() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      getTopPlayers(),
-      getTopGoalies()
-    ]).then(([playersData, goaliesData]) => {
-      setPlayers(playersData);
-      setGoalies(goaliesData);
+    const cachedPlayers = getCachedData<Player[]>('players');
+    const cachedGoalies = getCachedData<any[]>('goalies');
+    if (cachedPlayers && cachedGoalies) {
+      setPlayers(cachedPlayers);
+      setGoalies(cachedGoalies);
       setLoading(false);
-    }).catch(err => {
-      console.error('Error fetching data:', err);
-      setLoading(false);
-    });
+    } else {
+      Promise.all([
+        getTopPlayers(),
+        getTopGoalies()
+      ]).then(([playersData, goaliesData]) => {
+        setPlayers(playersData);
+        setGoalies(goaliesData);
+        setCachedData('players', playersData);
+        setCachedData('goalies', goaliesData);
+        setLoading(false);
+      }).catch(err => {
+        console.error('Error fetching data:', err);
+        setLoading(false);
+      });
+    }
   }, []);
 
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
@@ -32,9 +43,27 @@ function PlayerStats() {
     ? goalies.slice(0, 20)
     : [...players].sort((a, b) => b[filter] - a[filter]).slice(0, 20);
 
+  const refreshData = () => {
+    clearCache('players');
+    clearCache('goalies');
+    setLoading(true);
+    Promise.all([getTopPlayers(), getTopGoalies()]).then(([playersData, goaliesData]) => {
+      setPlayers(playersData);
+      setGoalies(goaliesData);
+      setCachedData('players', playersData);
+      setCachedData('goalies', goaliesData);
+      setLoading(false);
+    });
+  };
+
   return (
     <div className="container">
-      <h1>{t.playerStats.title}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h1>{t.playerStats.title}</h1>
+        <button onClick={refreshData} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+          {language === 'fr' ? 'Actualiser' : 'Refresh'}
+        </button>
+      </div>
       <div className="filters">
         <button 
           className={filter === 'points' ? 'active' : ''} 
