@@ -110,21 +110,32 @@ function MyBets() {
   async function cancelParlay(parlayId: number, amount: number) {
     if (!confirm('Cancel this parlay and refund your currency?')) return;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('currency')
-      .eq('id', user?.id)
-      .single();
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('currency')
+        .eq('id', user?.id)
+        .single();
 
-    await supabase.from('parlay_bets').delete().eq('id', parlayId);
-    
-    await supabase
-      .from('profiles')
-      .update({ currency: (profile?.currency || 0) + amount })
-      .eq('id', user?.id);
+      const { error: deleteError } = await supabase.from('parlay_bets').delete().eq('id', parlayId);
+      
+      if (deleteError) {
+        console.error('Delete error:', deleteError);
+        alert('Failed to cancel parlay: ' + deleteError.message);
+        return;
+      }
+      
+      await supabase
+        .from('profiles')
+        .update({ currency: (profile?.currency || 0) + amount })
+        .eq('id', user?.id);
 
-    await refreshProfile();
-    loadParlayBets();
+      await refreshProfile();
+      loadParlayBets();
+    } catch (err: any) {
+      console.error('Cancel parlay error:', err);
+      alert('Failed to cancel parlay: ' + err.message);
+    }
   }
 
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
