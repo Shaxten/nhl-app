@@ -81,7 +81,9 @@ function Injuries() {
 
   async function fetchInjuries() {
     try {
-      const response = await fetch('https://www.espn.com/nhl/injuries');
+      const isDev = import.meta.env.DEV;
+      const url = isDev ? '/api/injuries' : 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.espn.com/nhl/injuries');
+      const response = await fetch(url);
       const html = await response.text();
       
       const parser = new DOMParser();
