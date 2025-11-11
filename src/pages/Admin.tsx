@@ -176,10 +176,12 @@ function Admin() {
               };
 
               if (won) {
-                const winnings = bet.amount * 2;
+                const odds = bet.odds || 2.0;
+                const winnings = Math.round(bet.amount * odds);
+                const profit = winnings - bet.amount;
                 updates.currency = (profile.currency || 0) + winnings;
-                updates.total_winnings = (profile.total_winnings || 0) + bet.amount;
-                logs.push(`  User ${profile.display_name}: WON ${bet.amount} (paid ${winnings})`);
+                updates.total_winnings = (profile.total_winnings || 0) + profit;
+                logs.push(`  User ${profile.display_name}: WON ${bet.amount} @ ${odds.toFixed(2)}x (paid ${winnings})`);
               } else {
                 updates.total_winnings = (profile.total_winnings || 0) - bet.amount;
                 logs.push(`  User ${profile.display_name}: LOST ${bet.amount}`);

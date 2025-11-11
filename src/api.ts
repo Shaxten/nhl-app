@@ -1,7 +1,4 @@
-const isDev = import.meta.env.DEV;
-
 function getUrl(path: string) {
-  if (isDev) return `/api/nhl${path}`;
   return `https://corsproxy.io/?${encodeURIComponent('https://api-web.nhle.com/v1' + path)}`;
 }
 

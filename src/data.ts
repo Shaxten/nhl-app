@@ -63,14 +63,17 @@ export async function getUpcomingGames() {
   const games = data.gameWeek?.[0]?.games || [];
   
   const teamRecords = new Map();
+  const teamPoints = new Map();
   standingsData.standings.forEach((team: any) => {
     if (team.teamAbbrev) {
       teamRecords.set(team.teamAbbrev.default, `${team.wins}-${team.losses}-${team.otLosses}`);
+      teamPoints.set(team.teamAbbrev.default, team.points);
     }
   });
   
   const now = new Date();
-  const upcomingGames = games.filter((game: any) => new Date(game.startTimeUTC) > now);
+  const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+  const upcomingGames = games.filter((game: any) => new Date(game.startTimeUTC) > thirtyMinutesAgo);
   
   return upcomingGames.map((game: any) => ({
     id: game.id,
@@ -82,11 +85,13 @@ export async function getUpcomingGames() {
     homeRecord: teamRecords.get(game.homeTeam.abbrev) || '',
     awayRecord: teamRecords.get(game.awayTeam.abbrev) || '',
     homeTeamName: game.homeTeam.placeName?.default + ' ' + game.homeTeam.commonName?.default,
-    awayTeamName: game.awayTeam.placeName?.default + ' ' + game.awayTeam.commonName?.default
+    awayTeamName: game.awayTeam.placeName?.default + ' ' + game.awayTeam.commonName?.default,
+    homePoints: teamPoints.get(game.homeTeam.abbrev) || 0,
+    awayPoints: teamPoints.get(game.awayTeam.abbrev) || 0
   }));
 }
 
-export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number, homeTeam: string, awayTeam: string) {
+export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number, homeTeam: string, awayTeam: string, odds: number) {
   const { supabase } = await import('./supabase');
   
   const { data: profile } = await supabase
@@ -99,7 +104,7 @@ export async function placeBet(userId: string, gameId: number, teamChoice: strin
     throw new Error('Insufficient funds');
   }
   
-  await supabase.from('bets').insert({
+  const betData: any = {
     user_id: userId,
     game_id: gameId,
     team_choice: teamChoice,
@@ -107,7 +112,15 @@ export async function placeBet(userId: string, gameId: number, teamChoice: strin
     status: 'pending',
     home_team: homeTeam,
     away_team: awayTeam
-  });
+  };
+  
+  try {
+    betData.odds = odds;
+  } catch (e) {
+    console.log('Odds column not available yet');
+  }
+  
+  await supabase.from('bets').insert(betData);
   
   await supabase
     .from('profiles')

@@ -8,6 +8,7 @@ interface Bet {
   game_id: number;
   team_choice: string;
   amount: number;
+  odds?: number;
   status: string;
   created_at: string;
   home_team?: string;
@@ -80,32 +81,36 @@ function MyBets() {
     <div className="container">
       <h1>{t.myBets.title}</h1>
       <table style={{ marginTop: '2rem' }}>
-        <thead>
+        <thead className="tableright">
           <tr>
-            <th>{t.myBets.game}</th>
+            <th className="game-center">{t.myBets.game}</th>
             <th>{t.myBets.betOn}</th>
             <th>{t.myBets.amount}</th>
-            <th>{t.myBets.status}</th>
-            <th>{language === 'fr' ? 'Date' : 'Date'}</th>
+            <th>{language === 'fr' ? 'Cote' : 'Odds'}</th>
+            <th>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
+            <th className="game-center">{t.myBets.status}</th>
+            <th className="date-left">{language === 'fr' ? 'Date' : 'Date'}</th>
             <th>{language === 'fr' ? 'Action' : 'Action'}</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="tableright">
           {bets.map(bet => (
             <tr key={bet.id}>
-              <td>{bet.away_team} @ {bet.home_team}</td>
+              <td className="game-center">{bet.away_team} @ {bet.home_team}</td>
               <td>
                 <img src={`https://assets.nhle.com/logos/nhl/svg/${bet.team_choice}_light.svg`} alt={bet.team_choice} style={{ width: '40px', height: '40px' }} />
               </td>
               <td>{bet.amount} MC</td>
-              <td>
+              <td style={{ color: '#fbbf24' }}>{bet.odds ? bet.odds.toFixed(2) : '2.00'}x</td>
+              <td style={{ color: '#fff' }}>{Math.round(bet.amount * (bet.odds || 2.0))} MC</td>
+              <td className="game-center">
                 <span style={{ 
                           color: bet.status === 'won' ? '#4ade80' : bet.status === 'lost' ? '#ff4a4a' : '#aaa' 
                 }}>
                   {bet.status === 'pending' ? t.myBets.pending : bet.status === 'won' ? t.myBets.won : t.myBets.lost}
                 </span>
               </td>
-              <td>{new Date(bet.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+              <td className="date-left">{new Date(bet.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
               <td>
                 {bet.status === 'pending' && (() => {
                   const gameStartTime = bet.game_start_time ? new Date(bet.game_start_time) : null;

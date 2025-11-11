@@ -17,6 +17,14 @@ body {
   text-align: right !important;
 }
 
+.tableright tr td.date-left, .tableright tr th.date-left {
+  text-align: left !important;
+}
+
+.tableright tr td.game-center, .tableright tr th.game-center {
+  text-align: center !important;
+}
+
 .predictions-table th:not(:nth-child(5)),
 .predictions-table td:not(:nth-child(5)) {
   text-align: center !important;

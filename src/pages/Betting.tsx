@@ -16,6 +16,8 @@ interface Game {
   awayRecord?: string;
   homeTeamName?: string;
   awayTeamName?: string;
+  homePoints?: number;
+  awayPoints?: number;
 }
 
 function Betting() {
@@ -23,14 +25,21 @@ function Betting() {
   const { language, t } = useLanguage();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
-  const [betAmount, setBetAmount] = useState<{ [key: number]: number }>({});
+  const [awayBetAmount, setAwayBetAmount] = useState<{ [key: number]: number }>({});
+  const [homeBetAmount, setHomeBetAmount] = useState<{ [key: number]: number }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    getUpcomingGames().then(data => {
-      setGames(data);
-      setLoading(false);
-    });
+    getUpcomingGames()
+      .then(data => {
+        console.log('Games loaded:', data);
+        setGames(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error loading games:', error);
+        setLoading(false);
+      });
   }, []);
 
   async function handleScorePrediction(gameId: number, homeTeam: string, awayTeam: string) {
@@ -78,6 +87,14 @@ function Betting() {
     }
   }
 
+  function calculateOdds(teamPoints: number, opponentPoints: number): number {
+    if (!teamPoints || !opponentPoints) return 2.0;
+    const pointDiff = teamPoints - opponentPoints;
+    const baseOdds = 2.0;
+    const adjustment = pointDiff * 0.02;
+    return Math.max(1.1, Math.min(5.0, baseOdds - adjustment));
+  }
+
   async function handleBet(gameId: number, teamChoice: 'home' | 'away') {
     if (!user || !profile) {
       navigate('/auth');
@@ -96,7 +113,7 @@ function Betting() {
       }
     }
 
-    const amount = betAmount[gameId] || 0;
+    const amount = teamChoice === 'away' ? (awayBetAmount[gameId] || 0) : (homeBetAmount[gameId] || 0);
     if (amount <= 0 || amount > profile.currency) {
       alert(t.betting.invalidAmount);
       return;
@@ -106,10 +123,18 @@ function Betting() {
       const game = games.find(g => g.id === gameId);
       if (!game) return;
       
-      await placeBet(user.id, gameId, teamChoice === 'home' ? game.homeTeam : game.awayTeam, amount, game.homeTeam, game.awayTeam);
+      const odds = teamChoice === 'home' 
+        ? calculateOdds(game.homePoints || 0, game.awayPoints || 0)
+        : calculateOdds(game.awayPoints || 0, game.homePoints || 0);
+      
+      await placeBet(user.id, gameId, teamChoice === 'home' ? game.homeTeam : game.awayTeam, amount, game.homeTeam, game.awayTeam, odds);
       await refreshProfile();
       alert(t.betting.betPlaced);
-      setBetAmount({ ...betAmount, [gameId]: 0 });
+      if (teamChoice === 'away') {
+        setAwayBetAmount({ ...awayBetAmount, [gameId]: 0 });
+      } else {
+        setHomeBetAmount({ ...homeBetAmount, [gameId]: 0 });
+      }
     } catch (error) {
       alert(t.betting.failedBet);
     }
@@ -117,15 +142,23 @@ function Betting() {
 
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
+  const today = new Date();
+  const dateStr = today.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
   return (
     <div className="container">
-      <h1>{t.betting.title}</h1>
+      <h1>{language === 'fr' ? `Placez vos bets du ${dateStr}` : `Place Your Bets for ${dateStr}`}</h1>
       {profile && (
         <div className="betting-currency" style={{ marginTop: '1rem' }}>
           {t.betting.availableCurrency}: <strong>{profile.currency} MC</strong>
         </div>
       )}
       <div style={{ marginTop: '2rem' }}>
+        {games.length === 0 && (
+          <p style={{ color: '#aaa', textAlign: 'center' }}>
+            {language === 'fr' ? 'Aucun match à venir aujourd\'hui' : 'No upcoming games today'}
+          </p>
+        )}
         {games.map(game => {
           const gameTime = new Date(game.startTime);
           const now = new Date();
@@ -134,69 +167,85 @@ function Betting() {
           
           return (
           <div key={game.id} className="division-card" style={{ marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '1rem' }}>
-              <div style={{ textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start', marginBottom: '1rem' }}>
+              <div style={{ textAlign: 'center', flex: 1 }}>
                 <img src={game.awayTeamLogo} alt={game.awayTeam} style={{ width: '80px', height: '80px' }} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.awayTeamName || game.awayTeam}</p>
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.3rem' }}>{game.awayTeamName || game.awayTeam}</p>
                 <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.awayRecord}</p>
-              </div>
-              <div className="game-vs" style={{ fontWeight: 'bold' }}>@</div>
-              <div style={{ textAlign: 'center' }}>
-                <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
-                <p style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{game.homeTeamName || game.homeTeam}</p>
-                <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
-              </div>
-            </div>
-            <p style={{ color: '#aaa', marginBottom: '1rem', textAlign: 'center' }}>
-              {new Date(game.startTime).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-            </p>
-            <div style={{ marginTop: '1rem' }}>
-              <input
-                type="number"
-                placeholder={t.betting.betAmount}
-                value={betAmount[game.id] || ''}
-                onChange={(e) => setBetAmount({ ...betAmount, [game.id]: Number(e.target.value) })}
-                style={{ padding: '0.5rem', marginRight: '1rem', width: '150px' }}
-                min="1"
-              />
-            </div>
-            {bettingClosed ? (
-              <p style={{ color: '#ff4a4a', marginTop: '1rem' }}>{t.betting.bettingClosed}</p>
-            ) : (
-              <>
-                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
-                  <button onClick={() => handleBet(game.id, 'away')}>
-                    {t.betting.betOn} {game.awayTeam}
-                  </button>
-                  <button onClick={() => handleBet(game.id, 'home')}>
-                    {t.betting.betOn} {game.homeTeam}
-                  </button>
-                </div>
-                {(game.homeTeam === 'MTL' || game.awayTeam === 'MTL') && (
-                  <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
-                    <h4 style={{ marginBottom: '0.5rem' }}>{t.betting.predictScore}</h4>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                      <input
-                        type="number"
-                        placeholder={game.awayTeam}
-                        min="0"
-                        style={{ width: '60px', padding: '0.5rem' }}
-                        id={`away-${game.id}`}
-                      />
-                      <span>-</span>
-                      <input
-                        type="number"
-                        placeholder={game.homeTeam}
-                        min="0"
-                        style={{ width: '60px', padding: '0.5rem' }}
-                        id={`home-${game.id}`}
-                      />
-                      <button onClick={() => handleScorePrediction(game.id, game.homeTeam, game.awayTeam)}>
-                        {t.betting.submitPrediction}
-                      </button>
-                    </div>
+                <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.awayPoints || 0, game.homePoints || 0).toFixed(2)}x</p>
+                {!bettingClosed && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <input
+                      type="number"
+                      placeholder={t.betting.betAmount}
+                      value={awayBetAmount[game.id] || ''}
+                      onChange={(e) => setAwayBetAmount({ ...awayBetAmount, [game.id]: Number(e.target.value) })}
+                      style={{ padding: '0.5rem', width: '100px', marginBottom: '0.5rem' }}
+                      min="1"
+                    />
+                    <br />
+                    <button onClick={() => handleBet(game.id, 'away')}>
+                      {language === 'fr' ? 'Miser' : 'Bet'}
+                    </button>
                   </div>
                 )}
+              </div>
+              <div style={{ textAlign: 'center', padding: '0 1rem' }}>
+                <div className="game-vs" style={{ fontWeight: 'bold', marginTop: '90px' }}>@</div>
+                <p style={{ color: '#aaa', fontSize: '1.3rem', marginTop: '55px' }}>
+                  {new Date(game.startTime).toLocaleTimeString(language === 'fr' ? 'fr-FR' : 'en-US', { hour: 'numeric', minute: '2-digit' })}
+                </p>
+              </div>
+              <div style={{ textAlign: 'center', flex: 1 }}>
+                <img src={game.homeTeamLogo} alt={game.homeTeam} style={{ width: '80px', height: '80px' }} />
+                <p style={{ marginTop: '0.5rem', fontWeight: 'bold', fontSize: '1.3rem' }}>{game.homeTeamName || game.homeTeam}</p>
+                <p className="pSmall" style={{ color: '#aaa', marginTop: '0.25rem' }}>{game.homeRecord}</p>
+                <p style={{ color: '#fbbf24', marginTop: '0.25rem' }}>{calculateOdds(game.homePoints || 0, game.awayPoints || 0).toFixed(2)}x</p>
+                {!bettingClosed && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <input
+                      type="number"
+                      placeholder={t.betting.betAmount}
+                      value={homeBetAmount[game.id] || ''}
+                      onChange={(e) => setHomeBetAmount({ ...homeBetAmount, [game.id]: Number(e.target.value) })}
+                      style={{ padding: '0.5rem', width: '100px', marginBottom: '0.5rem' }}
+                      min="1"
+                    />
+                    <br />
+                    <button onClick={() => handleBet(game.id, 'home')}>
+                      {language === 'fr' ? 'Miser' : 'Bet'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            {bettingClosed ? (
+              <p style={{ color: '#ff4a4a', marginTop: '1rem', textAlign: 'center' }}>{t.betting.bettingClosed}</p>
+            ) : (
+              <>
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#333', borderRadius: '4px' }}>
+                  <h4 style={{ marginBottom: '0.5rem' }}>{t.betting.predictScore}</h4>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <input
+                      type="number"
+                      placeholder={game.awayTeam}
+                      min="0"
+                      style={{ width: '60px', padding: '0.5rem' }}
+                      id={`away-${game.id}`}
+                    />
+                    <span>-</span>
+                    <input
+                      type="number"
+                      placeholder={game.homeTeam}
+                      min="0"
+                      style={{ width: '60px', padding: '0.5rem' }}
+                      id={`home-${game.id}`}
+                    />
+                    <button onClick={() => handleScorePrediction(game.id, game.homeTeam, game.awayTeam)}>
+                      {t.betting.submitPrediction}
+                    </button>
+                  </div>
+                </div>
               </>
             )}
           </div>
