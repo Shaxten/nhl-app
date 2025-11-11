@@ -8,6 +8,7 @@ interface Translations {
     news: string;
     stats: string;
     betting: string;
+    gambling: string;
     divisions: string;
     teamStats: string;
     playerStats: string;
@@ -141,6 +142,7 @@ const translations: Record<Language, Translations> = {
       news: 'News',
       stats: 'Stats',
       betting: 'Gambling',
+      gambling: 'Place your bets',
       divisions: 'Divisions',
       teamStats: 'Team',
       playerStats: 'Player',
@@ -272,6 +274,7 @@ const translations: Record<Language, Translations> = {
       news: 'Nouvelles',
       stats: 'Statistiques',
       betting: 'Bets',
+      gambling: 'Placez vos bets',
       divisions: 'Divisions',
       teamStats: 'Équipes',
       playerStats: 'Joueurs',

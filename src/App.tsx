@@ -13,6 +13,8 @@ import ScorePredictions from './pages/ScorePredictions';
 import Leaderboard from './pages/Leaderboard';
 import Admin from './pages/Admin';
 import News from './pages/News';
+import Transactions from './pages/Transactions';
+import Injuries from './pages/Injuries';
 
 function Navigation() {
   const { user, profile, signOut } = useAuth();
@@ -25,7 +27,14 @@ function Navigation() {
         <ul style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <li><Link to="/">{t.nav.home}</Link></li>
-            <li><Link to="/news">{t.nav.news}</Link></li>
+            <li className="dropdown">
+              <span><Link to="/news">{t.nav.news} ▾</Link></span>
+              <ul className="dropdown-menu">
+                <li><Link to="/news">{language === 'fr' ? 'Nouvelles' : 'News'}</Link></li>
+                <li><Link to="/transactions">{language === 'fr' ? 'Transactions' : 'Transactions'}</Link></li>
+                <li><Link to="/injuries">{language === 'fr' ? 'Blessures' : 'Injuries'}</Link></li>
+              </ul>
+            </li>
             <li className="dropdown">
               <span><Link to="/players">{t.nav.stats} ▾</Link></span>
               <ul className="dropdown-menu">
@@ -37,6 +46,7 @@ function Navigation() {
             <li className="dropdown">
              <span><Link to="/betting">{t.nav.betting} ▾</Link></span>
               <ul className="dropdown-menu">
+                {user && <li><Link to="/betting">{t.nav.gambling}</Link></li>}
                 {user && <li><Link to="/my-bets">{t.nav.myBets}</Link></li>}
                 {user && <li><Link to="/score-predictions">{t.nav.scorePredictions}</Link></li>}
                 <li><Link to="/leaderboard">{t.nav.leaderboard}</Link></li>
@@ -72,7 +82,14 @@ function Navigation() {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item"><Link className="nav-link" to="/">{t.nav.home}</Link></li>
-              <li className="nav-item"><Link className="nav-link" to="/news">{t.nav.news}</Link></li>
+              <li className="nav-item dropdown">
+                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.news}</a>
+                <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
+                  <li><Link className="dropdown-item" to="/news" style={{ color: '#fff' }}>{language === 'fr' ? 'Nouvelles' : 'News'}</Link></li>
+                  <li><Link className="dropdown-item" to="/transactions" style={{ color: '#fff' }}>{language === 'fr' ? 'Transactions' : 'Transactions'}</Link></li>
+                  <li><Link className="dropdown-item" to="/injuries" style={{ color: '#fff' }}>{language === 'fr' ? 'Blessures' : 'Injuries'}</Link></li>
+                </ul>
+              </li>
               <li className="nav-item dropdown">
                 <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.stats}</a>
                 <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
@@ -123,6 +140,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/news" element={<News />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/injuries" element={<Injuries />} />
           <Route path="/divisions" element={<Divisions />} />
           <Route path="/teams" element={<TeamStats />} />
           <Route path="/players" element={<PlayerStats />} />
