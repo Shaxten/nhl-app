@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getCachedData, setCachedData, clearCache } from '../utils/cache';
 
 interface Injury {
   player: string;
@@ -12,8 +13,44 @@ interface Injury {
 interface TeamInjuries {
   team: string;
   teamName: string;
+  teamAbbrev: string;
   injuries: Injury[];
 }
+
+const teamLogos: { [key: string]: string } = {
+  'ANA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ana.png&h=80&w=80',
+  'BOS': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/bos.png&h=80&w=80',
+  'BUF': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/buf.png&h=80&w=80',
+  'CAR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/car.png&h=80&w=80',
+  'CBJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cbj.png&h=80&w=80',
+  'CGY': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/cgy.png&h=80&w=80',
+  'CHI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/chi.png&h=80&w=80',
+  'COL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/col.png&h=80&w=80',
+  'DAL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/dal.png&h=80&w=80',
+  'DET': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/det.png&h=80&w=80',
+  'EDM': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/edm.png&h=80&w=80',
+  'FLA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/fla.png&h=80&w=80',
+  'LA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png&h=80&w=80',
+  'MIN': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/min.png&h=80&w=80',
+  'MTL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png&h=80&w=80',
+  'NJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nj.png&h=80&w=80',
+  'NSH': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nsh.png&h=80&w=80',
+  'NYI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyi.png&h=80&w=80',
+  'NYR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/nyr.png&h=80&w=80',
+  'OTT': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/ott.png&h=80&w=80',
+  'PHI': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/phi.png&h=80&w=80',
+  'PIT': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/pit.png&h=80&w=80',
+  'SEA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sea.png&h=80&w=80',
+  'SJ': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/sj.png&h=80&w=80',
+  'STL': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/stl.png&h=80&w=80',
+  'TB': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tb.png&h=80&w=80',
+  'TOR': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/tor.png&h=80&w=80',
+  'UTA': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/uta.png&h=80&w=80',
+  'VAN': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/van.png&h=80&w=80',
+  'VGK': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/vgk.png&h=80&w=80',
+  'WPG': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wpg.png&h=80&w=80',
+  'WSH': 'https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/wsh.png&h=80&w=80'
+};
 
 function Injuries() {
   const { language } = useLanguage();
@@ -21,8 +58,14 @@ function Injuries() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    fetchInjuries();
+    const cached = getCachedData<TeamInjuries[]>(`injuries_${language}`);
+    if (cached) {
+      setTeamInjuries(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      fetchInjuries();
+    }
   }, [language]);
 
   async function translateText(text: string): Promise<string> {
@@ -50,8 +93,21 @@ function Injuries() {
       for (const table of tables) {
         const teamEl = table.querySelector('.Table__Title');
         const fullTeamName = teamEl?.textContent?.trim() || '';
-        const logoImg = table.querySelector('.Table__Title img');
-        const logoSrc = logoImg?.getAttribute('src') || '';
+        
+        const teamAbbrevMap: { [key: string]: string } = {
+          'Anaheim Ducks': 'ANA', 'Boston Bruins': 'BOS', 'Buffalo Sabres': 'BUF',
+          'Carolina Hurricanes': 'CAR', 'Columbus Blue Jackets': 'CBJ', 'Calgary Flames': 'CGY',
+          'Chicago Blackhawks': 'CHI', 'Colorado Avalanche': 'COL', 'Dallas Stars': 'DAL',
+          'Detroit Red Wings': 'DET', 'Edmonton Oilers': 'EDM', 'Florida Panthers': 'FLA',
+          'Los Angeles Kings': 'LA', 'Minnesota Wild': 'MIN', 'Montréal Canadiens': 'MTL',
+          'New Jersey Devils': 'NJ', 'Nashville Predators': 'NSH', 'New York Islanders': 'NYI',
+          'New York Rangers': 'NYR', 'Ottawa Senators': 'OTT', 'Philadelphia Flyers': 'PHI',
+          'Pittsburgh Penguins': 'PIT', 'Seattle Kraken': 'SEA', 'San Jose Sharks': 'SJ',
+          'St. Louis Blues': 'STL', 'Tampa Bay Lightning': 'TB', 'Toronto Maple Leafs': 'TOR',
+          'Utah Hockey Club': 'UTA', 'Vancouver Canucks': 'VAN', 'Vegas Golden Knights': 'VGK',
+          'Winnipeg Jets': 'WPG', 'Washington Capitals': 'WSH'
+        };
+        const teamAbbrev = teamAbbrevMap[fullTeamName] || '';
         
         const injuries: Injury[] = [];
         const rows = table.querySelectorAll('tbody tr');
@@ -70,7 +126,7 @@ function Injuries() {
         });
         
         if (injuries.length > 0) {
-          result.push({ team: logoSrc, teamName: fullTeamName, injuries });
+          result.push({ team: '', teamName: fullTeamName, teamAbbrev, injuries });
         }
       }
       
@@ -85,6 +141,7 @@ function Injuries() {
       }
       
       setTeamInjuries(result);
+      setCachedData(`injuries_${language}`, result);
     } catch (error) {
       console.error('Error fetching injuries:', error);
     }
@@ -98,17 +155,17 @@ function Injuries() {
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1>{language === 'fr' ? 'Blessures' : 'Injuries'}</h1>
-        <button onClick={() => { setLoading(true); fetchInjuries(); }} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+        <button onClick={() => { clearCache(`injuries_${language}`); setLoading(true); fetchInjuries(); }} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
           {language === 'fr' ? 'Actualiser' : 'Refresh'}
         </button>
       </div>
       
       {teamInjuries.map((teamData, teamIndex) => (
         <div key={teamIndex} style={{ marginBottom: '2rem' }}>
-          <h3 style={{ background: '#2a2a2a', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ background: '#2a2a2a', padding: '0.75rem', borderRadius: '4px 4px 0 0', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>{teamData.teamName}</span>
-            {teamData.team && (
-              <img src={teamData.team} alt="team logo" style={{ width: '50px', height: '50px' }} />
+            {teamLogos[teamData.teamAbbrev] && (
+              <img src={teamLogos[teamData.teamAbbrev]} alt={teamData.teamAbbrev} style={{ width: '40px', height: '40px' }} />
             )}
           </h3>
           <table style={{ width: '100%', borderCollapse: 'collapse', background: '#1a1a1a' }}>

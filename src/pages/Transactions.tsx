@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getCachedData, setCachedData, clearCache } from '../utils/cache';
 
 interface Transaction {
   team: string;
@@ -52,8 +53,14 @@ function Transactions() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    fetchTransactions();
+    const cached = getCachedData<TransactionDay[]>(`transactions_${language}`);
+    if (cached) {
+      setTransactionsByDay(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      fetchTransactions();
+    }
   }, [language]);
 
   async function translateText(text: string): Promise<string> {
@@ -109,6 +116,7 @@ function Transactions() {
       }
       
       setTransactionsByDay(result);
+      setCachedData(`transactions_${language}`, result);
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
@@ -122,7 +130,7 @@ function Transactions() {
     <div className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1>{language === 'fr' ? 'Transactions' : 'Transactions'}</h1>
-        <button onClick={() => { setLoading(true); fetchTransactions(); }} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+        <button onClick={() => { clearCache(`transactions_${language}`); setLoading(true); fetchTransactions(); }} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
           {language === 'fr' ? 'Actualiser' : 'Refresh'}
         </button>
       </div>
