@@ -21,7 +21,7 @@ import Injuries from './pages/Injuries';
 function Navigation() {
   const { user, profile, signOut } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const { theme, toggleTheme, setTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
