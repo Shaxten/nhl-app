@@ -26,7 +26,7 @@ function Profile() {
     <div className="container">
       <h1>{t.profile.title}</h1>
       <button onClick={refreshProfile} style={{ marginTop: '1rem' }}>
-        {language === 'fr' ? 'Actualiser' : 'Refresh Stats'}
+        {language === 'fr' ? 'Actualiser' : 'Refresh'}
       </button>
       <div className="team-stats" style={{ marginTop: '2rem' }}>
         <div className="stats-summary">
