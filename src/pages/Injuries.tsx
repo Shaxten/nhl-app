@@ -101,7 +101,7 @@ function Injuries() {
           'Carolina Hurricanes': 'CAR', 'Columbus Blue Jackets': 'CBJ', 'Calgary Flames': 'CGY',
           'Chicago Blackhawks': 'CHI', 'Colorado Avalanche': 'COL', 'Dallas Stars': 'DAL',
           'Detroit Red Wings': 'DET', 'Edmonton Oilers': 'EDM', 'Florida Panthers': 'FLA',
-          'Los Angeles Kings': 'LA', 'Minnesota Wild': 'MIN', 'Montréal Canadiens': 'MTL',
+          'Los Angeles Kings': 'LA', 'Minnesota Wild': 'MIN', 'Montreal Canadiens': 'MTL', 'Montréal Canadiens': 'MTL',
           'New Jersey Devils': 'NJ', 'Nashville Predators': 'NSH', 'New York Islanders': 'NYI',
           'New York Rangers': 'NYR', 'Ottawa Senators': 'OTT', 'Philadelphia Flyers': 'PHI',
           'Pittsburgh Penguins': 'PIT', 'Seattle Kraken': 'SEA', 'San Jose Sharks': 'SJ',
@@ -109,7 +109,15 @@ function Injuries() {
           'Utah Hockey Club': 'UTA', 'Vancouver Canucks': 'VAN', 'Vegas Golden Knights': 'VGK',
           'Winnipeg Jets': 'WPG', 'Washington Capitals': 'WSH'
         };
-        const teamAbbrev = teamAbbrevMap[fullTeamName] || '';
+        let teamAbbrev = teamAbbrevMap[fullTeamName];
+        if (!teamAbbrev) {
+          const lowerName = fullTeamName.toLowerCase();
+          if (lowerName.includes('montr') || lowerName.includes('canadien')) {
+            teamAbbrev = 'MTL';
+          } else {
+            teamAbbrev = '';
+          }
+        }
         
         const injuries: Injury[] = [];
         const rows = table.querySelectorAll('tbody tr');
