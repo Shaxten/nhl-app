@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import hockeyImage from '../../public/images/newhook.jpg'
+import hockeyImage from '/images/newhook.jpg'
 function Home() {
   const { language } = useLanguage();
   return (
