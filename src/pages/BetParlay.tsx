@@ -99,7 +99,7 @@ function BetParlay() {
     }
 
     try {
-      const { data, error } = await supabase.from('parlay_bets').insert({
+      const { error } = await supabase.from('parlay_bets').insert({
         user_id: user.id,
         selections: selections.map(s => ({ game_id: s.gameId, team: s.team, odds: s.odds })),
         bet_amount: betAmount,
