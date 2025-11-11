@@ -178,7 +178,7 @@ const translations: Record<Language, Translations> = {
       goalsAgainst: 'GA',
     },
     playerStats: {
-      title: 'Player Statistics',
+      title: 'Top Players',
       player: 'Player',
       team: 'Team',
       position: 'Pos',
@@ -300,7 +300,7 @@ const translations: Record<Language, Translations> = {
       points: 'Points',
     },
     teamStats: {
-      title: 'Statistiques des équipes',
+      title: 'Statistiques par équipe',
       team: 'Équipe',
       gp: 'PJ',
       wins: 'V',
@@ -311,7 +311,7 @@ const translations: Record<Language, Translations> = {
       goalsAgainst: 'BC',
     },
     playerStats: {
-      title: 'Statistiques des joueurs',
+      title: 'Top joueurs',
       player: 'Joueur',
       team: 'Équipe',
       position: 'Pos',

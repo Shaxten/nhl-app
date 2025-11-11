@@ -21,7 +21,7 @@ import Injuries from './pages/Injuries';
 function Navigation() {
   const { user, profile, signOut } = useAuth();
   const { language, setLanguage, t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, setTheme } = useTheme();
 
   return (
     <>
@@ -64,8 +64,8 @@ function Navigation() {
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <li>
-              <button onClick={toggleTheme} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: 'none', cursor: 'pointer' }}>
-                {theme === 'dark' ? '☀️' : '🌙'}
+              <button onClick={toggleTheme} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--accent)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                {theme === 'dark' ? '☀️' : theme === 'light' ? '🌙' : theme === 'habs' ? <img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png&h=30&w=30" alt="MTL" style={{ width: '20px', height: '20px' }} /> : <img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png&h=30&w=30" alt="LA" style={{ width: '20px', height: '20px' }} />}
               </button>
             </li>
             <li>
@@ -118,8 +118,8 @@ function Navigation() {
                 </ul>
               </li>
               <li className="nav-item">
-                <button className="btn btn-sm" onClick={toggleTheme} style={{ background: 'var(--accent)', color: 'var(--bg-primary)', margin: '0.5rem' }}>
-                  {theme === 'dark' ? '☀️' : '🌙'}
+                <button className="btn btn-sm" onClick={toggleTheme} style={{ background: 'var(--accent)', color: 'var(--bg-primary)', margin: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {theme === 'dark' ? '☀️' : theme === 'light' ? '🌙' : theme === 'habs' ? <img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/mtl.png&h=30&w=30" alt="MTL" style={{ width: '20px', height: '20px' }} /> : <img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/nhl/500/la.png&h=30&w=30" alt="LA" style={{ width: '20px', height: '20px' }} />}
                 </button>
               </li>
               <li className="nav-item">

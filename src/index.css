@@ -32,6 +32,34 @@
   --selected-bg: #bbf7d0;
 }
 
+:root[data-theme="habs"] {
+  --bg-primary: #192168;
+  --bg-secondary: #213080;
+  --bg-tertiary: #2a3d98;
+  --text-primary: #e8e8e8;
+  --text-secondary: #b0b0b0;
+  --accent: #af1e2d;
+  --accent-gold: #c3b27f;
+  --accent-yellow: #d4a017;
+  --border: #3a4aa8;
+  --hover-bg: #2a3d98;
+  --selected-bg: #8b1a26;
+}
+
+:root[data-theme="kings"] {
+  --bg-primary: #111111;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #2d2d2d;
+  --text-primary: #a2aaad;
+  --text-secondary: #6f7579;
+  --accent: #a2aaad;
+  --accent-gold: #c3b27f;
+  --accent-yellow: #ffd700;
+  --border: #a2aaad;
+  --hover-bg: #2d2d2d;
+  --selected-bg: #3d3d3d;
+}
+
 /* Global CSS */
 
 body {
@@ -79,6 +107,19 @@ body {
 
 h1, h2, h3 {
     color: var(--accent);
+}
+
+[data-theme="habs"] h1,
+[data-theme="habs"] h2 {
+    text-shadow: 0.5px 0.5px 0.5px #fff, -0.5px -0.5px 0.5px #fff, 0.5px -0.5px 0.5px #fff, -0.5px 0.5px 0.5px #fff, 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="habs"] h3 {
+    text-shadow: none !important;
+}
+
+[data-theme="habs"] button {
+    color: #fff !important;
 }
 
 h1 {
