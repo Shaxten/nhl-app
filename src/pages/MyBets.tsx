@@ -24,6 +24,7 @@ interface ParlayBet {
   potential_win: number;
   status: string;
   created_at: string;
+  earliest_game_time?: string;
 }
 
 function MyBets() {
@@ -81,7 +82,27 @@ function MyBets() {
         console.error('Error loading parlay bets:', error);
         return;
       }
-      if (data) setParlayBets(data);
+      
+      if (data) {
+        const parlaysWithGameTimes = await Promise.all(
+          data.map(async (parlay) => {
+            try {
+              const gameTimes = await Promise.all(
+                parlay.selections.map(async (sel: any) => {
+                  const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${sel.game_id}/landing`);
+                  const gameData = await response.json();
+                  return gameData.startTimeUTC;
+                })
+              );
+              const earliestTime = gameTimes.sort()[0];
+              return { ...parlay, earliest_game_time: earliestTime };
+            } catch {
+              return parlay;
+            }
+          })
+        );
+        setParlayBets(parlaysWithGameTimes);
+      }
     } catch (err) {
       console.error('Failed to load parlay bets:', err);
     }
@@ -238,14 +259,21 @@ function MyBets() {
                     </td>
                     <td className="date-left">{new Date(parlay.created_at).toLocaleString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
                     <td className="action-column">
-                      {parlay.status === 'pending' && (
-                        <button 
-                          onClick={() => cancelParlay(parlay.id, parlay.bet_amount)}
-                          style={{ background: '#ff4a4a' }}
-                        >
-                          Cancel
-                        </button>
-                      )}
+                      {parlay.status === 'pending' && (() => {
+                        const gameStartTime = parlay.earliest_game_time ? new Date(parlay.earliest_game_time) : null;
+                        const now = new Date();
+                        const fifteenMinutesAfterStart = gameStartTime ? new Date(gameStartTime.getTime() + 15 * 60 * 1000) : null;
+                        const canCancel = !fifteenMinutesAfterStart || now < fifteenMinutesAfterStart;
+                        
+                        return canCancel ? (
+                          <button 
+                            onClick={() => cancelParlay(parlay.id, parlay.bet_amount)}
+                            style={{ background: '#ff4a4a' }}
+                          >
+                            Cancel
+                          </button>
+                        ) : null;
+                      })()}
                     </td>
                   </tr>
                 ))}
