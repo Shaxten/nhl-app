@@ -76,7 +76,7 @@ function Transactions() {
 
   async function fetchTransactions() {
     try {
-      const response = await fetch('/api/transactions');
+      const response = await fetch('https://www.espn.com/nhl/transactions');
       const html = await response.text();
       
       const parser = new DOMParser();

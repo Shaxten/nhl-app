@@ -81,7 +81,7 @@ function Injuries() {
 
   async function fetchInjuries() {
     try {
-      const response = await fetch('/api/injuries');
+      const response = await fetch('https://www.espn.com/nhl/injuries');
       const html = await response.text();
       
       const parser = new DOMParser();
