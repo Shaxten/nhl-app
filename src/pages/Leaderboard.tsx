@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
 
@@ -20,6 +20,10 @@ function Leaderboard() {
   const { t, language } = useLanguage();
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   async function fetchLeaderboard() {
     const { data: profiles } = await supabase
@@ -78,6 +82,25 @@ function Leaderboard() {
     return ((won / total) * 100).toFixed(1);
   }
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2;
+    scrollRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
@@ -86,7 +109,21 @@ function Leaderboard() {
       <button onClick={() => { setLoading(true); fetchLeaderboard(); }} style={{ marginTop: '1rem' }}>
         {language === 'fr' ? 'Actualiser' : 'Refresh'}
       </button>
-      <div style={{ overflowX: 'auto', marginTop: '2rem' }}>
+      <div 
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        style={{ 
+          overflowX: 'auto', 
+          marginTop: '2rem', 
+          cursor: isDragging ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+        className="hide-scrollbar">
       <table style={{ minWidth: '1200px' }}>
         <thead className="tableright">
           <tr style={{ textAlign: 'right' }}>

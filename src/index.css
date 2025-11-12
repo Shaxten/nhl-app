@@ -381,3 +381,7 @@ input[type="password"] {
     font-size: 1.5rem;
   }
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
