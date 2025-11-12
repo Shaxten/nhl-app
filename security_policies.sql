@@ -102,9 +102,21 @@ CREATE TRIGGER bet_resolution_trigger
   WHEN (OLD.status = 'pending' AND NEW.status IN ('won', 'lost'))
   EXECUTE FUNCTION resolve_bet();
 
--- Add username validation
+-- Fix existing invalid usernames first
+UPDATE profiles 
+SET display_name = 'User' || SUBSTRING(id::text, 1, 8)
+WHERE display_name IS NULL 
+   OR char_length(display_name) < 3 
+   OR char_length(display_name) > 20
+   OR display_name !~ '^[a-zA-Z0-9_-]+$';
+
+-- Add username validation (NOT VALID to skip existing rows check)
 ALTER TABLE profiles ADD CONSTRAINT username_length_check 
-  CHECK (char_length(username) >= 3 AND char_length(username) <= 20);
+  CHECK (char_length(display_name) >= 3 AND char_length(display_name) <= 20) NOT VALID;
 
 ALTER TABLE profiles ADD CONSTRAINT username_format_check 
-  CHECK (username ~ '^[a-zA-Z0-9_-]+$');
+  CHECK (display_name ~ '^[\w\s.-]+$') NOT VALID;
+
+-- Validate constraints for future inserts/updates only
+ALTER TABLE profiles VALIDATE CONSTRAINT username_length_check;
+ALTER TABLE profiles VALIDATE CONSTRAINT username_format_check;
