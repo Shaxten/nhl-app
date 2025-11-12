@@ -108,15 +108,11 @@ function Admin() {
 
       if (!pendingBets || pendingBets.length === 0) {
         logs.push('No pending bets to resolve');
-        setResults(logs);
-        setProcessing(false);
-        return;
-      }
+      } else {
+        logs.push(`Found ${pendingBets.length} pending bets`);
 
-      logs.push(`Found ${pendingBets.length} pending bets`);
-
-      // Get unique game IDs
-      const gameIds = [...new Set(pendingBets.map(bet => bet.game_id))];
+        // Get unique game IDs
+        const gameIds = [...new Set(pendingBets.map(bet => bet.game_id))];
 
       for (const gameId of gameIds) {
         try {
@@ -215,7 +211,78 @@ function Admin() {
         }
       }
 
-      logs.push('Bet resolution complete!')
+        logs.push('Bet resolution complete!');
+      }
+
+      // Now resolve parlays
+      logs.push('\n--- Resolving Parlays ---');
+      const { data: pendingParlays } = await supabase
+        .from('parlay_bets')
+        .select('*')
+        .eq('status', 'pending');
+
+      if (!pendingParlays || pendingParlays.length === 0) {
+        logs.push('No pending parlays to resolve');
+      } else {
+        logs.push(`Found ${pendingParlays.length} pending parlays`);
+
+        for (const parlay of pendingParlays) {
+          const selections = parlay.selections;
+          let allGamesFinished = true;
+          let allCorrect = true;
+
+          for (const selection of selections) {
+            const gameId = selection.game_id || selection.gameId;
+            try {
+              const response = await fetch(`https://corsproxy.io/?https://api-web.nhle.com/v1/gamecenter/${gameId}/landing`);
+              const gameData = await response.json();
+
+              if (gameData.gameState !== 'OFF' && gameData.gameState !== 'FINAL') {
+                allGamesFinished = false;
+                break;
+              }
+
+              const homeScore = gameData.homeTeam?.score || 0;
+              const awayScore = gameData.awayTeam?.score || 0;
+              const winner = homeScore > awayScore ? gameData.homeTeam?.abbrev : awayScore > homeScore ? gameData.awayTeam?.abbrev : 'TIE';
+
+              if (winner === 'TIE' || selection.team !== winner) {
+                allCorrect = false;
+              }
+            } catch (error) {
+              logs.push(`  Error checking game ${gameId}: ${error}`);
+              allGamesFinished = false;
+              break;
+            }
+          }
+
+          if (!allGamesFinished) {
+            logs.push(`  Parlay ${parlay.id}: Not all games finished yet`);
+            continue;
+          }
+
+          const newStatus = allCorrect ? 'won' : 'lost';
+          await supabase.from('parlay_bets').update({ status: newStatus }).eq('id', parlay.id);
+
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('currency')
+            .eq('id', parlay.user_id)
+            .single();
+
+          if (profile && allCorrect) {
+            await supabase
+              .from('profiles')
+              .update({ currency: (profile.currency || 0) + parlay.potential_win })
+              .eq('id', parlay.user_id);
+            logs.push(`  Parlay ${parlay.id}: WON - Paid ${parlay.potential_win} MC`);
+          } else {
+            logs.push(`  Parlay ${parlay.id}: LOST - ${parlay.bet_amount} MC`);
+          }
+        }
+
+        logs.push('Parlay resolution complete!');
+      }
       
     } catch (error) {
       logs.push(`Error: ${error}`);
