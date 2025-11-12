@@ -147,7 +147,7 @@ function BetParlay() {
             const gameTime = new Date(game.startTime);
             const now = new Date();
             const timeDiff = (now.getTime() - gameTime.getTime()) / (1000 * 60);
-            const bettingClosed = timeDiff > 30;
+            const bettingClosed = timeDiff > 5;
             const homeSelected = selections.find(s => s.gameId === game.id && s.team === game.homeTeam);
             const awaySelected = selections.find(s => s.gameId === game.id && s.team === game.awayTeam);
 

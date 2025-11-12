@@ -136,8 +136,8 @@ function Betting() {
       const now = new Date();
       const timeDiff = (now.getTime() - gameTime.getTime()) / (1000 * 60);
       
-      if (timeDiff > 30) {
-        alert(t.betting.bettingClosed + ': Game started more than 30 minutes ago');
+      if (timeDiff > 5) {
+        alert(t.betting.bettingClosed + ': Game started more than 5 minutes ago');
         return;
       }
     }
@@ -196,7 +196,7 @@ function Betting() {
           const gameTime = new Date(game.startTime);
           const now = new Date();
           const timeDiff = (now.getTime() - gameTime.getTime()) / (1000 * 60);
-          const bettingClosed = timeDiff > 30;
+          const bettingClosed = timeDiff > 5;
           
           return (
           <div key={game.id} className="division-card" style={{ marginBottom: '2rem' }}>
