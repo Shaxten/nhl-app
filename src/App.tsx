@@ -115,9 +115,9 @@ function Navigation() {
                 </ul>
               </li>
               <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{t.nav.betting}</a>
+                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{language === 'fr' ? 'Placez vos bets' : 'Place Your Bets'}</a>
                 <ul className="dropdown-menu" style={{ background: '#1a1a1a' }}>
-                  <li><Link className="dropdown-item" to="/betting" style={{ color: '#fff' }}>{t.nav.betting}</Link></li>
+                  <li><Link className="dropdown-item" to="/betting" style={{ color: '#fff' }}>{language === 'fr' ? 'Placez vos bets' : 'Place Your Bets'}</Link></li>
                   {user && <li><Link className="dropdown-item" to="/bet-parlay" style={{ color: '#fff' }}>{language === 'fr' ? 'Faites un parlay' : 'Do a Parlay'}</Link></li>}
                   <li><Link className="dropdown-item" to="/leaderboard" style={{ color: '#fff' }}>{t.nav.leaderboard}</Link></li>
                 </ul>
