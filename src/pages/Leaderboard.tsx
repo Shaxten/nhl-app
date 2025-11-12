@@ -116,7 +116,7 @@ function Leaderboard() {
               <td>{leader.parlays_total || 0}</td>
               <td>{leader.parlays_won || 0}</td>
               <td style={{ color: (leader.parlays_profit || 0) >= 0 ? '#4ade80' : '#ff4a4a' }}>
-                {(leader.parlays_profit || 0) >= 0 ? '+ ' : '- '}{Math.abs(leader.parlays_profit || 0)}
+                {(leader.parlays_profit || 0) >= 0 ? '+ ' : '- '}{Math.round(Math.abs(leader.parlays_profit || 0))}
               </td>
               <td>{leader.score_predictions_total || 0}</td>
               <td>

@@ -167,42 +167,23 @@ function Admin() {
             const won = bet.team_choice === winner;
             const newStatus = won ? 'won' : 'lost';
 
-            // Update bet status first
-            const { error: betError } = await supabase.from('bets').update({ status: newStatus }).eq('id', bet.id).eq('status', 'pending');
-            
-            // If bet was already updated by another process, skip
-            if (betError) {
-              logs.push(`  Bet ${bet.id} already processed`);
-              continue;
-            }
+            const odds = bet.odds || 2.0;
+            const { error: resolveError } = await supabase.rpc('admin_resolve_bet', {
+              bet_id: bet.id,
+              new_status: newStatus,
+              user_id_param: bet.user_id,
+              bet_amount_param: bet.amount,
+              bet_odds_param: odds
+            });
 
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', bet.user_id)
-              .single();
-
-            if (profile) {
-              const updates: any = {
-                bets_won: won ? (profile.bets_won || 0) + 1 : profile.bets_won || 0,
-                bets_lost: won ? profile.bets_lost || 0 : (profile.bets_lost || 0) + 1,
-              };
-
+            if (resolveError) {
+              logs.push(`  ERROR resolving bet ${bet.id}: ${resolveError.message}`);
+            } else {
               if (won) {
-                const odds = bet.odds || 2.0;
                 const winnings = Math.round(bet.amount * odds);
-                const profit = winnings - bet.amount;
-                updates.currency = (profile.currency || 0) + winnings;
-                updates.total_winnings = (profile.total_winnings || 0) + profit;
-                logs.push(`  User ${profile.display_name}: WON ${bet.amount} @ ${odds.toFixed(2)}x (paid ${winnings})`);
+                logs.push(`  Bet ${bet.id}: WON ${bet.amount} @ ${odds.toFixed(2)}x (paid ${winnings})`);
               } else {
-                updates.total_winnings = (profile.total_winnings || 0) - bet.amount;
-                logs.push(`  User ${profile.display_name}: LOST ${bet.amount}`);
-              }
-
-              const { error: profileError } = await supabase.from('profiles').update(updates).eq('id', bet.user_id);
-              if (profileError) {
-                logs.push(`  ERROR updating profile for ${profile.display_name}: ${profileError.message}`);
+                logs.push(`  Bet ${bet.id}: LOST ${bet.amount}`);
               }
             }
           }
@@ -262,22 +243,22 @@ function Admin() {
           }
 
           const newStatus = allCorrect ? 'won' : 'lost';
-          await supabase.from('parlay_bets').update({ status: newStatus }).eq('id', parlay.id);
+          const { error: parlayError } = await supabase.rpc('admin_resolve_parlay', {
+            parlay_id: parlay.id,
+            new_status: newStatus,
+            user_id_param: parlay.user_id,
+            bet_amount_param: parlay.bet_amount,
+            potential_win_param: parlay.potential_win
+          });
 
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('currency')
-            .eq('id', parlay.user_id)
-            .single();
-
-          if (profile && allCorrect) {
-            await supabase
-              .from('profiles')
-              .update({ currency: (profile.currency || 0) + parlay.potential_win })
-              .eq('id', parlay.user_id);
-            logs.push(`  Parlay ${parlay.id}: WON - Paid ${parlay.potential_win} MC`);
+          if (parlayError) {
+            logs.push(`  ERROR resolving parlay ${parlay.id}: ${parlayError.message}`);
           } else {
-            logs.push(`  Parlay ${parlay.id}: LOST - ${parlay.bet_amount} MC`);
+            if (allCorrect) {
+              logs.push(`  Parlay ${parlay.id}: WON - Paid ${parlay.potential_win} MC`);
+            } else {
+              logs.push(`  Parlay ${parlay.id}: LOST - ${parlay.bet_amount} MC`);
+            }
           }
         }
 
