@@ -135,7 +135,6 @@ function Leaderboard() {
             <th style={{ minWidth: '120px' }}>{language === 'fr' ? 'Taux de victoire' : 'Win Rate'}</th>
             <th>{language === 'fr' ? 'Total Parlays' : 'Total Parlays'}</th>
             <th>{language === 'fr' ? 'Parlays gagnés' : 'Parlays Won'}</th>
-            <th>{language === 'fr' ? 'Profit Parlays' : 'Parlay Profit'}</th>
             <th>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</th>
             <th>{language === 'fr' ? 'Précision' : 'Prediction Accuracy'}</th>
             <th>{language === 'fr' ? 'Gains totaux' : 'Total Winnings'}</th>
@@ -152,9 +151,6 @@ function Leaderboard() {
               <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)} %</td>
               <td>{leader.parlays_total || 0}</td>
               <td>{leader.parlays_won || 0}</td>
-              <td style={{ color: (leader.parlays_profit || 0) >= 0 ? '#4ade80' : '#ff4a4a' }}>
-                {(leader.parlays_profit || 0) >= 0 ? '+ ' : '- '}{Math.round(Math.abs(leader.parlays_profit || 0))}
-              </td>
               <td>{leader.score_predictions_total || 0}</td>
               <td>
                 {(leader.score_predictions_total || 0) > 0 
