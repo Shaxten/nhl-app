@@ -93,6 +93,16 @@ function BetParlay() {
       return;
     }
 
+    const now = new Date();
+    for (const sel of selections) {
+      const gameTime = new Date(sel.game.startTime);
+      const timeDiff = (now.getTime() - gameTime.getTime()) / (1000 * 60);
+      if (timeDiff > 5) {
+        alert(language === 'fr' ? 'Un ou plusieurs matchs ont commencé il y a plus de 5 minutes' : 'One or more games started more than 5 minutes ago');
+        return;
+      }
+    }
+
     if (betAmount <= 0 || betAmount > profile.currency) {
       alert(t.betting.invalidAmount);
       return;
