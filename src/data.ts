@@ -94,16 +94,6 @@ export async function getUpcomingGames() {
 export async function placeBet(userId: string, gameId: number, teamChoice: string, amount: number, homeTeam: string, awayTeam: string, odds: number) {
   const { supabase } = await import('./supabase');
   
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('currency')
-    .eq('id', userId)
-    .single();
-  
-  if (!profile || profile.currency < amount) {
-    throw new Error('Insufficient funds');
-  }
-  
   const betData: any = {
     user_id: userId,
     game_id: gameId,
@@ -111,21 +101,15 @@ export async function placeBet(userId: string, gameId: number, teamChoice: strin
     amount,
     status: 'pending',
     home_team: homeTeam,
-    away_team: awayTeam
+    away_team: awayTeam,
+    odds
   };
   
-  try {
-    betData.odds = odds;
-  } catch (e) {
-    console.log('Odds column not available yet');
+  const { error } = await supabase.from('bets').insert(betData);
+  
+  if (error) {
+    throw new Error(error.message);
   }
-  
-  await supabase.from('bets').insert(betData);
-  
-  await supabase
-    .from('profiles')
-    .update({ currency: profile.currency - amount })
-    .eq('id', userId);
 }
 
 export async function getTopPlayers(): Promise<Player[]> {
