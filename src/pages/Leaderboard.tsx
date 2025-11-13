@@ -157,8 +157,8 @@ function Leaderboard() {
                   ? `${((leader.score_predictions_correct || 0) / (leader.score_predictions_total || 1) * 100).toFixed(1)} %`
                   : '0 %'}
               </td>
-              <td style={{ color: (leader.total_winnings || 0) >= 0 ? '#4ade80' : '#ff4a4a' }}>
-                {(leader.total_winnings || 0) >= 0 ? '+ ' : (leader.total_winnings || 0) < 0 ? '- ' : ''}{Math.abs(leader.total_winnings || 0)}
+              <td style={{ color: (leader.currency - 1000) >= 0 ? '#4ade80' : '#ff4a4a' }}>
+                {(leader.currency - 1000) >= 0 ? '+ ' : '- '}{Math.abs(leader.currency - 1000)}
               </td>
             </tr>
           ))}
