@@ -116,28 +116,28 @@ function Leaderboard() {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         style={{ 
-          overflowX: 'auto', 
+          overflowX: 'auto',
+          overflowY: 'auto',
+          maxHeight: '600px',
           marginTop: '2rem', 
           cursor: isDragging ? 'grabbing' : 'grab',
           userSelect: 'none',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
-        }}
-        className="hide-scrollbar">
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+        }}>
       <table style={{ minWidth: '1200px' }}>
         <thead className="tableright">
           <tr style={{ textAlign: 'right' }}>
-            <th>{t.leaderboard.rank}</th>
-            <th>{t.leaderboard.player}</th>
-            <th>{t.leaderboard.currency}</th>
-            <th style={{ minWidth: '120px' }}>{language === 'fr' ? 'Bets gagnés' : 'Bets Won'}</th>
-            <th style={{ minWidth: '120px' }}>{language === 'fr' ? 'Bets perdus' : 'Bets Lost'}</th>
-            <th style={{ minWidth: '120px' }}>{language === 'fr' ? 'Taux de victoire' : 'Win Rate'}</th>
-            <th>{language === 'fr' ? 'Total Parlays' : 'Total Parlays'}</th>
-            <th>{language === 'fr' ? 'Parlays gagnés' : 'Parlays Won'}</th>
-            <th>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</th>
-            <th>{language === 'fr' ? 'Précision' : 'Prediction Accuracy'}</th>
-            <th>{language === 'fr' ? 'Gains totaux' : 'Total Winnings'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.leaderboard.rank}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.leaderboard.player}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.leaderboard.currency}</th>
+            <th style={{ minWidth: '120px', position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Bets gagnés' : 'Bets Won'}</th>
+            <th style={{ minWidth: '120px', position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Taux de victoire' : 'Win Rate'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Total Parlays' : 'Total Parlays'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Parlays gagnés' : 'Parlays Won'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Total de prédictions' : 'Total Predictions'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Précision' : 'Prediction Accuracy'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Gains totaux' : 'Total Winnings'}</th>
           </tr>
         </thead>
         <tbody className="tableright">
@@ -147,7 +147,6 @@ function Leaderboard() {
               <td>{leader.display_name}</td>
               <td>{leader.currency} MC</td>
               <td>{leader.bets_won || 0}</td>
-              <td>{leader.bets_lost || 0}</td>
               <td>{getWinRate(leader.bets_won || 0, leader.bets_lost || 0)} %</td>
               <td>{leader.parlays_total || 0}</td>
               <td>{leader.parlays_won || 0}</td>
@@ -158,7 +157,7 @@ function Leaderboard() {
                   : '0 %'}
               </td>
               <td style={{ color: (leader.currency - 1000) >= 0 ? '#4ade80' : '#ff4a4a' }}>
-                {(leader.currency - 1000) >= 0 ? '+ ' : '- '}{Math.abs(leader.currency - 1000)}
+                {(leader.currency - 1000) >= 0 ? '+ ' : '- '}{Math.abs(leader.currency - 1000)} MC
               </td>
             </tr>
           ))}

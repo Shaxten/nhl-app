@@ -8,7 +8,6 @@ import TeamStats from './pages/TeamStats';
 import PlayerStats from './pages/PlayerStats';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
-import ChangePassword from './pages/ChangePassword';
 import Betting from './pages/Betting';
 import BetParlay from './pages/BetParlay';
 import MyBets from './pages/MyBets';
@@ -62,7 +61,6 @@ function Navigation() {
                   <li><Link to="/my-bets">{t.nav.myBets}</Link></li>
                   <li><Link to="/score-predictions">{t.nav.scorePredictions}</Link></li>
                   <li><Link to="/profile">{t.profile.title}</Link></li>
-                  <li><Link to="/change-password">{language === 'fr' ? 'Changer mot de passe' : 'Change Password'}</Link></li>
                 </ul>
               </li>
             ) : (
@@ -143,7 +141,6 @@ function Navigation() {
                       <li><Link className="dropdown-item" to="/my-bets" style={{ color: '#fff' }}>{t.nav.myBets}</Link></li>
                       <li><Link className="dropdown-item" to="/score-predictions" style={{ color: '#fff' }}>{t.nav.scorePredictions}</Link></li>
                       <li><Link className="dropdown-item" to="/profile" style={{ color: '#fff' }}>{t.profile.title}</Link></li>
-                      <li><Link className="dropdown-item" to="/change-password" style={{ color: '#fff' }}>{language === 'fr' ? 'Changer mot de passe' : 'Change Password'}</Link></li>
                     </ul>
                   </li>
                   <li className="nav-item"><button className="btn btn-sm" onClick={signOut} style={{ background: '#a8d5ff', color: '#000', margin: '0.5rem' }}>{t.nav.signOut}</button></li>
@@ -182,7 +179,6 @@ function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/change-password" element={<ChangePassword />} />
         </Routes>
           </Router>
         </LanguageProvider>

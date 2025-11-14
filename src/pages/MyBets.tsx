@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { supabase } from '../supabase';
@@ -33,6 +33,12 @@ function MyBets() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [parlayBets, setParlayBets] = useState<ParlayBet[]>([]);
   const [loading, setLoading] = useState(true);
+  const singleBetsRef = useRef<HTMLDivElement>(null);
+  const parlayBetsRef = useRef<HTMLDivElement>(null);
+  const [isDraggingSingle, setIsDraggingSingle] = useState(false);
+  const [isDraggingParlay, setIsDraggingParlay] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -159,6 +165,21 @@ function MyBets() {
     }
   }
 
+  const handleMouseDown = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement>, setDragging: (val: boolean) => void) => {
+    if (!ref.current) return;
+    setDragging(true);
+    setStartY(e.pageY - ref.current.offsetTop);
+    setScrollTop(ref.current.scrollTop);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement>, isDragging: boolean) => {
+    if (!isDragging || !ref.current) return;
+    e.preventDefault();
+    const y = e.pageY - ref.current.offsetTop;
+    const walk = (y - startY) * 2;
+    ref.current.scrollTop = scrollTop - walk;
+  };
+
   if (loading) return <div className="container"><h1>{t.common.loading}</h1></div>;
 
   return (
@@ -166,18 +187,32 @@ function MyBets() {
       <h1>{t.myBets.title}</h1>
       
       <h2 style={{ marginTop: '2rem' }}>{language === 'fr' ? 'Bets simples' : 'Single Bets'}</h2>
-      <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '1rem' }}>
+      <div 
+        ref={singleBetsRef}
+        onMouseDown={(e) => handleMouseDown(e, singleBetsRef, setIsDraggingSingle)}
+        onMouseMove={(e) => handleMouseMove(e, singleBetsRef, isDraggingSingle)}
+        onMouseUp={() => setIsDraggingSingle(false)}
+        onMouseLeave={() => setIsDraggingSingle(false)}
+        style={{ 
+          maxHeight: '600px', 
+          overflowY: 'auto', 
+          marginTop: '1rem',
+          cursor: isDraggingSingle ? 'grabbing' : 'grab',
+          userSelect: 'none',
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+        }}>
       <table style={{ width: '100%' }}>
         <thead className="tableright">
           <tr>
-            <th className="game-center">{t.myBets.game}</th>
-            <th>{t.myBets.betOn}</th>
-            <th>{t.myBets.amount}</th>
-            <th>{language === 'fr' ? 'Cote' : 'Odds'}</th>
-            <th>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
-            <th className="game-center">{t.myBets.status}</th>
-            <th className="date-left">{language === 'fr' ? 'Date' : 'Date'}</th>
-            <th className="action-column">{language === 'fr' ? 'Action' : 'Action'}</th>
+            <th className="game-center" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.game}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.betOn}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.amount}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Cote' : 'Odds'}</th>
+            <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
+            <th className="game-center" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.status}</th>
+            <th className="date-left" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Date' : 'Date'}</th>
+            <th className="action-column" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Action' : 'Action'}</th>
           </tr>
         </thead>
         <tbody className="tableright">
@@ -224,17 +259,31 @@ function MyBets() {
       {parlayBets.length > 0 && (
         <>
           <h2 style={{ marginTop: '2rem' }}>Parlays</h2>
-          <div style={{ maxHeight: '600px', overflowY: 'auto', marginTop: '1rem' }}>
+          <div 
+            ref={parlayBetsRef}
+            onMouseDown={(e) => handleMouseDown(e, parlayBetsRef, setIsDraggingParlay)}
+            onMouseMove={(e) => handleMouseMove(e, parlayBetsRef, isDraggingParlay)}
+            onMouseUp={() => setIsDraggingParlay(false)}
+            onMouseLeave={() => setIsDraggingParlay(false)}
+            style={{ 
+              maxHeight: '600px', 
+              overflowY: 'auto', 
+              marginTop: '1rem',
+              cursor: isDraggingParlay ? 'grabbing' : 'grab',
+              userSelect: 'none',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+            }}>
             <table style={{ width: '100%' }}>
               <thead className="tableright">
                 <tr>
-                  <th>{language === 'fr' ? 'Sélections' : 'Selections'}</th>
-                  <th>{t.myBets.amount}</th>
-                  <th>{language === 'fr' ? 'Cote totale' : 'Total Odds'}</th>
-                  <th>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
-                  <th className="game-center">{t.myBets.status}</th>
-                  <th className="date-left">{language === 'fr' ? 'Date' : 'Date'}</th>
-                  <th className="action-column">{language === 'fr' ? 'Action' : 'Action'}</th>
+                  <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Sélections' : 'Selections'}</th>
+                  <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.amount}</th>
+                  <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Cote totale' : 'Total Odds'}</th>
+                  <th style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Gain potentiel' : 'Potential Win'}</th>
+                  <th className="game-center" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{t.myBets.status}</th>
+                  <th className="date-left" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Date' : 'Date'}</th>
+                  <th className="action-column" style={{ position: 'sticky', top: 0, background: 'var(--bg-tertiary)', zIndex: 1 }}>{language === 'fr' ? 'Action' : 'Action'}</th>
                 </tr>
               </thead>
               <tbody className="tableright">

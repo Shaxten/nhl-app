@@ -56,12 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
     
     if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        display_name: email.split('@')[0],
-        currency: 1000
-      });
-      if (profileError) console.error('Profile creation error:', profileError);
+      let displayName = email.split('@')[0];
+      let suffix = 1;
+      let inserted = false;
+      
+      while (!inserted) {
+        const { error: profileError } = await supabase.from('profiles').insert({
+          id: data.user.id,
+          display_name: suffix === 1 ? displayName : `${displayName}${suffix}`,
+          currency: 1000
+        });
+        
+        if (!profileError) {
+          inserted = true;
+        } else if (profileError.code === '23505') {
+          suffix++;
+        } else {
+          console.error('Profile creation error:', profileError);
+          break;
+        }
+      }
     }
   }
 
@@ -81,7 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .from('profiles')
       .update({ display_name: name })
       .eq('id', user.id);
-    if (error) throw error;
+    if (error) {
+      if (error.code === '23505') {
+        throw new Error('Ce nom est déjà utilisé');
+      }
+      throw error;
+    }
     await loadProfile(user.id);
   }
 
